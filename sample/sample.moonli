@@ -1,29 +1,43 @@
-defpackage :moonli-sample
-  use :cl;
-  export :foo;
-end defpackage
 
+## Define a package: a namespace
+defpackage :moonli-sample
+    use :cl;
+    export :foo;
+end
+
+## Change to that namespace
 in-package :moonli-sample
 
+
+## Define a function
+defun foo(x):
+    x
+end
+
+## Define a global variable
 defvar moonli-sample:foo = $abc;
+
 print(*package*)
 print(foo)
 format(t, "hello! ~s: ~a~%", $foo, foo)
 
+## Define another global variable
 defparameter ht = {
-  :a : 2,
-  "b" : 3
+    :a : 2,
+    "b" : 3
 }
 
 let a = 1:
-  a
-end let
+    ## Define and use a local variable 'a'
+    a
+end
 
-
+## Define and use a new local variable 'a' again
 let a = 1:
-  format(
-    t,
-    "a + gethash(:a, ht) + gethash(\"b\", ht) = ~a~%",
-    a + gethash(:a, ht) + gethash("b", ht)
-  )
-end let
+    format(
+        t,
+        "a + gethash(:a, ht) + gethash(\"b\", ht) = ~a~%",
+        # Inline arithmetic
+        a + gethash(:a, ht) + gethash("b", ht)
+    )
+end

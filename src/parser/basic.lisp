@@ -54,12 +54,22 @@
                          (format s "Unexpected token."))))
                (terpri s)))))
 
-(defvar *record-whitespace* nil)
+(defstruct (comment (:constructor make-comment (depth string)))
+  depth
+  string)
 
-(defstruct (ws-record (:constructor
-                          make-ws-record (start end)))
-  start
-  end)
+(defmethod print-object ((c comment) s)
+  (dotimes (i (comment-depth c))
+    (write-char #\; s))
+  (format s "~a" (comment-string c)))
+
+(esrap:defrule comment
+    (and (+ #\#)
+         (* (not (or #\newline #\return)))
+         (or #\newline #\return))
+  (:function (lambda (expr)
+               (make-comment (length (first expr))
+                             (esrap:text (second expr))))))
 
 (esrap:defrule whitespace/internal
     (or #\Space #\Tab)
@@ -77,12 +87,12 @@
   (:error-report nil))
 
 (esrap:defrule whitespace/end
-    (or #\newline #\return #\;)
+    (or comment #\newline #\return #\;)
   (:constant nil)
   (:error-report nil))
 
 (esrap:defrule whitespace
-    (or #\space #\tab #\newline #\return)
+    (or comment #\space #\tab #\newline #\return)
   (:constant nil)
   (:error-report nil))
 
@@ -93,10 +103,7 @@
 
 (esrap:defrule *whitespace
     (* whitespace)
-  (:lambda (expr esrap:&bounds start end)
-    (declare (ignore expr))
-    (when *record-whitespace*
-      (make-ws-record start end)))
+  (:constant nil)
   (:error-report nil))
 
 (esrap:defrule *whitespace/end
@@ -105,8 +112,7 @@
   (:error-report nil))
 
 (esrap:defrule *whitespace/all
-    (* (or whitespace/end whitespace/internal))
-  (:constant nil)
+    (* (or comment whitespace/end whitespace/internal))
   (:error-report nil))
 
 (esrap:defrule numeric-character (esrap:character-ranges (#\0 #\9))

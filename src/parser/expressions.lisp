@@ -16,7 +16,8 @@
         expr:hash-set))
 
 (esrap:defrule moonli-expression
-    (or macro-call
+    (or comment
+        macro-call
         short-macro-call
         infix-expression))
 
