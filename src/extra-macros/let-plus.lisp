@@ -1,7 +1,7 @@
 (in-package :moonli)
 
 (esrap:defrule let+-binding
-    (and (or expr:function-call
+    (and (or chain
              good-symbol
              bracketed-expression
              expr:list)
@@ -20,7 +20,7 @@
 
 (esrap:defrule let+-bindings
     (or (and let+-binding
-             (* (and mandatory-comma
+             (* (and #\,
                      +whitespace
                      let+-binding
                      *whitespace)))
