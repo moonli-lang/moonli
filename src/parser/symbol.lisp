@@ -49,6 +49,8 @@
   ;; expression or semantic
   (not (or (member symbol '(end elif else)
                    :test #'string-equal)
+           (gethash symbol *moonli-macro-functions*)
+           (gethash symbol *moonli-short-macro-functions*)
            (ignore-errors
             (parse-number:parse-number (symbol-name symbol))))))
 

@@ -351,6 +351,12 @@ end"))
    (slots (* defstruct-slot)))
   `(defstruct ,name ,@slots))
 
+(def-test defpackage (macro-call)
+  (:moonli "defpackage foo
+  :use cl;
+end"
+   :lisp (defpackage foo (:use cl))))
+
 (def-test defstruct (macro-call)
   (:moonli "defstruct foo
   a;

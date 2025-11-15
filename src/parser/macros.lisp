@@ -24,12 +24,12 @@
 (defmacro define-moonli-macro (name &body (moonli-macro-bindings . body))
   (alexandria:with-gensyms (expr subexpr args fn idx symbol)
     (let* ((namep (namep-symbol name))
-           (macro-rule `(and (,namep good-symbol)
+           (macro-rule `(and (,namep expr:symbol)
                              +whitespace
                              ,@(mapcar #'second moonli-macro-bindings)
                              *whitespace "end"
                              (esrap:? +whitespace/internal)
-                             (esrap:? (,namep good-symbol)))))
+                             (esrap:? (,namep expr:symbol)))))
       `(progn
          (defun ,namep (,symbol)
            (eq ,symbol ',name))
@@ -58,7 +58,7 @@
     (name &body (moonli-macro-bindings . body))
   (alexandria:with-gensyms (expr subexpr args fn idx symbol)
     (let* ((namep (namep-symbol name))
-           (macro-rule `(and (,namep good-symbol)
+           (macro-rule `(and (,namep expr:symbol)
                              +whitespace/internal
                              ,@(mapcar #'second moonli-macro-bindings))))
       `(progn
