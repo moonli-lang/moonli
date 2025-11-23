@@ -7,7 +7,7 @@
   (:function third))
 
 (esrap:defrule quoted-expression
-    (and #\$ atomic-expression)
+    (and #\$ (or atomic-expression expr:symbol))
   (:function (lambda (expr)
                `(cl:quote ,(second expr)))))
 
