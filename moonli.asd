@@ -29,6 +29,7 @@
                 :components ((:file "moonli-macro")
                              (:file "moonli-short-macro")))
                (:file "moonli")
+               (:file "pretty-printer")
                (:file "binary"))
   :perform (test-op (c s)
              (eval (read-from-string "(5AM:RUN! :MOONLI)")))

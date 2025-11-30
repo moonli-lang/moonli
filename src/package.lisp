@@ -36,6 +36,9 @@
            #:define-moonli-macro
            #:define-moonli-short-macro
 
+           #:moonli-pprint-object
+           #:moonli-hash-table-pprint-indent*
+
            #:main)
   (:local-nicknames (:expr :moonli/expressions)))
 
