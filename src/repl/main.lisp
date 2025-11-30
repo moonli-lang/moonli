@@ -130,7 +130,9 @@ ___  ___                      _  _  ______  _____ ______  _
          (let* ((*package* (find-package :moonli-user))
                 (*debugger-hook* (if *debugger-enabled-p*
                                      #'debugger
-                                     #'display-error-without-debugging)))
+                                     #'display-error-without-debugging))
+                (*print-pretty* t)
+                (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*))
            (repl))
       (save-history)
       (rl:deprep-terminal))
