@@ -133,6 +133,9 @@ ___  ___                      _  _  ______  _____ ______  _
                                      #'display-error-without-debugging))
                 (*print-pretty* t)
                 (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*))
+           (asdf:initialize-source-registry (list :source-registry
+                                                  (list :directory (uiop:getcwd))
+                                                  :inherit-configuration))
            (repl))
       (save-history)
       (rl:deprep-terminal))
