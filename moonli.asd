@@ -27,7 +27,8 @@
                              (:file "expressions")))
                (:module "macros"
                 :components ((:file "moonli-macro")
-                             (:file "moonli-short-macro")))
+                             (:file "moonli-short-macro")
+                             (:file "defclass")))
                (:file "moonli")
                (:file "pretty-printer")
                (:file "binary"))
