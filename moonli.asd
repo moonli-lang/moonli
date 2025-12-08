@@ -28,6 +28,9 @@
                (:module "macros"
                 :components ((:file "moonli-macro")
                              (:file "moonli-short-macro")
+                             (:file "functions")
+                             (:file "defpackage")
+                             (:file "defstruct")
                              (:file "defclass")))
                (:file "moonli")
                (:file "pretty-printer")

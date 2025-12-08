@@ -1,5 +1,7 @@
 (in-package :moonli)
 
+(5am:in-suite :moonli)
+
 (esrap:defrule defclass/slot/attribute
     (and expr:symbol
          *whitespace
