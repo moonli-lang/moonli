@@ -109,7 +109,10 @@
   (:function process-binary-infix-expression))
 
 (esrap:defrule optionally-typed-expression
-    (or typed-expression atomic-expression))
+    (or typed-expression
+        macro-call
+        short-macro-call
+        atomic-expression))
 
 (esrap:defrule typed-expression
     (and atomic-expression
@@ -122,6 +125,11 @@
                      ,(first expr)))))
 
 (5am:def-test infix-expression ()
+  (5am:is (equal `(+ 2 (cond ((zerop x)
+                              -1)
+                             (t
+                              1)))
+                 (esrap:parse 'infix-expression "2 + if zerop(x): -1 else: 1 end")))
   (5am:is (equal `(+ (* 2 3) 4)
                  (esrap:parse 'infix-expression "2 * 3 + 4")))
   (5am:is (equal `(+ 2 (* 3 4))
