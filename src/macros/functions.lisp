@@ -91,3 +91,106 @@ end")
     sum ^ 2
   end
 end"))
+
+
+(esrap:defrule defmethod/name
+    (or (and expr:symbol
+             *whitespace/internal
+             expr:symbol)
+        expr:symbol)
+  (:function (lambda (args)
+               (if (consp args)
+                   (list (first args) (third args))
+                   (list args)))))
+
+(esrap:defrule defmethod/ll-parameter
+    (or (and expr:symbol
+             *whitespace/internal
+             "::"
+             *whitespace/internal
+             (or expr:symbol expr:list))
+        expr:symbol)
+  (:function (lambda (args)
+               (if (consp args)
+                   (list (first args) (fifth args))
+                   args))))
+
+(esrap:defrule defmethod/lambda-list
+    (or (and #\( *whitespace #\))
+        (and #\(
+             *whitespace
+             defmethod/ll-parameter
+             *whitespace
+             (* (and #\, *whitespace defmethod/ll-parameter *whitespace))
+             #\))
+        (and #\(
+             (+ (and *whitespace
+                     defmethod/ll-parameter
+                     *whitespace #\, *whitespace))
+             #\)))
+  (:function (lambda (expr)
+               (if (null (cdddr expr))  ; length = 3, first or last
+                   (mapcar #'second (second expr))
+                   (cons (third expr)   ; middle
+                         (mapcar #'third (fifth expr)))))))
+
+(define-moonli-macro defmethod
+  ((qualifier-name defmethod/name)
+   (_ *whitespace/internal)
+   (lambda-list defmethod/lambda-list)
+   (_ *whitespace/internal)
+   (_ #\:)
+   (_ *whitespace/all)
+   (body (esrap:? moonli)))
+  `(defmethod ,@qualifier-name ,lambda-list
+     ,@(rest body)))
+
+(def-test defmethod (macro-call)
+  (:moonli "defmethod our-identity(x): x end"
+   :lisp (defmethod our-identity (x) x))
+  (:moonli "defmethod :before our-identity(x):
+  format(t, \"Returning identity~%\")
+end"
+   :lisp (defmethod :before our-identity (x)
+           (format t "Returning identity~%")))
+  (:moonli "defmethod :after our-identity(x):
+  format(t, \"Returned identity~%\")
+end"
+   :lisp (defmethod :after our-identity (x)
+           (format t "Returned identity~%")))
+  (:moonli "defmethod add (x :: number, y :: number):
+ x + y
+end"
+   :lisp (defmethod add ((x number) (y number))
+           (+ x y)))
+  (:moonli "defmethod add (x :: number, y :: number, &rest, others):
+  x + if null(others):
+    y
+  else:
+    apply(function(add), y, others)
+  end
+end"
+   :lisp (defmethod add ((x number) (y number) &rest others)
+           (+ x
+              (cond ((null others)
+                     y)
+                    (t
+                     (apply #'add y others))))))
+  (:moonli "defmethod add (x :: number, y :: number, &rest, others):
+  x + (if null(others):
+    y
+  else:
+    apply(function(add), y, others)
+  end)
+end"
+   :lisp (defmethod add ((x number) (y number) &rest others)
+           (+ x
+              (cond ((null others)
+                     y)
+                    (t
+                     (apply #'add y others))))))
+  (:moonli "defmethod add (x :: string, y):
+  uiop:strcat(x, y)
+end"
+   :lisp (defmethod add ((x string) y)
+           (uiop:strcat x y))))
