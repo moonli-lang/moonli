@@ -12,74 +12,111 @@
                `(,(intern (symbol-name (first expr)) :keyword)
                  ,(fifth expr)))))
 
-(esrap:defrule defclass/slot
-    (and expr:symbol
-         *whitespace/internal
-         (or ";"
-             (and ":"
-                  *whitespace/all
-                  defclass/slot/attribute
-                  *whitespace/internal
-                  (* (and ","
-                          *whitespace/all
-                          defclass/slot/attribute
-                          *whitespace/internal))
-                  ";")))
+(esrap:defrule defclass/slot/attributes
+    (or ";"
+        (and ":"
+             *whitespace/all
+             defclass/slot/attribute
+             *whitespace/internal
+             (* (and ","
+                     *whitespace/all
+                     defclass/slot/attribute
+                     *whitespace/internal))
+             ";"))
   (:function (lambda (expr)
-               `(,(first expr)
-                 ,@(if (and (stringp (third expr))
-                            (string= ";" (third expr)))
-                       ()
-                       (nconc (third (third expr))
-                              (alexandria:mappend #'third (fifth (third expr)))))))))
+               (if (and (stringp expr)
+                        (string= ";" expr))
+                   nil
+                   (nconc (third expr)
+                          (alexandria:mappend
+                           #'third
+                           (fifth expr)))))))
+
+(define-condition moonli-defclass-parse-error (moonli-parse-error)
+  ((section :initarg :section))
+  (:report (lambda (c s)
+             (with-slots (section) c
+               (format s "Expected '~a' to end" (string-downcase section))))))
 
 (esrap:defrule defclass/slots
     (and "slots"
-         (and *whitespace/internal
-              ":"
-              *whitespace/all
-              (* (and defclass/slot *whitespace/all))
-              "end"))
-  (:function (lambda (expr)
-               (cons :slots
-                     (list (mapcar #'first (fourth (second expr))))))))
-
-(esrap:defrule defclass/option
-    (and good-symbol
-         *whitespace
+         *whitespace/internal
          ":"
-         *whitespace
-         moonli-expression)
+         *whitespace/all
+         expr:symbol
+         (* (and *whitespace/internal
+                 defclass/slot/attributes
+                 *whitespace/all
+                 expr:symbol)))
   (:function (lambda (expr)
-               `(,(intern (symbol-name (first expr)) :keyword)
-                 ,(fifth expr)))))
+               (let ((endp (string-equal
+                            "end"
+                            (if (null (sixth expr))
+                                (fifth expr)
+                                (fourth (alexandria:lastcar (sixth expr)))))))
+                 (unless endp
+                   (error 'moonli-defclass-parse-error
+                          :section 'slots)))
+               (let ((slots
+                       (loop :for slot-name
+                               := (or next-slot (fifth expr))
+                             :for attrs-slots :in (sixth expr)
+                             :for attrs := (second attrs-slots)
+                             :for next-slot := (fourth attrs-slots)
+                             :collect (cons slot-name attrs))))
+                 (cons :slots (list slots))))))
 
 (esrap:defrule defclass/options
-    (and defclass/option
+    (and "options"
+         *whitespace/internal
+         ":"
+         *whitespace/all
+         expr:symbol
          (* (and *whitespace/internal
-                 ","
+                 ":"
+                 *whitespace/internal
+                 moonli-expression
+                 *whitespace/internal
+                 ";"
                  *whitespace/all
-                 defclass/option))
-         ";")
+                 expr:symbol)))
   (:function (lambda (expr)
-               (cons :options
-                     (cons (first expr)
-                           (mapcar #'fourth (second expr)))))))
+               (let ((endp (string-equal
+                            "end"
+                            (if (null (sixth expr))
+                                (fifth expr)
+                                (eighth (alexandria:lastcar (sixth expr)))))))
+                 (unless endp
+                   (error 'moonli-defclass-parse-error
+                          :section 'options)))
+               (let ((options
+                       (loop :for option-name
+                               := (or next-option-name (fifth expr))
+                             :for value-options :in (sixth expr)
+                             :for value := (fourth value-options)
+                             :for next-option-name := (eighth value-options)
+                             :collect
+                             (list (intern (string option-name) :keyword)
+                                   value))))
+                 (cons :options options)))))
 
 (esrap:defrule defclass/slots-and-options
-    (or (and defclass/options)
+    (or (and defclass/options
+             *whitespace/all
+             (esrap:? defclass/slots))
         (and defclass/slots
-             *whitespace
-             defclass/options)
-        (and defclass/slots))
+             *whitespace/all
+             (esrap:? defclass/options)))
   (:function (lambda (expr)
-               (cond ((= 3 (length expr))
-                      (nconc (rest (first expr))
-                             (rest (third expr))))
-                     ((eq :slots (first (first expr)))
-                      (rest (first expr)))
-                     ((eq :options (first (first expr)))
-                      (cons () (rest (first expr))))))))
+               (let ((expr (list (first expr) (third expr))))
+                 (cond ((and (first expr)
+                             (second expr))
+                        (nconc (cdr (assoc :slots expr))
+                               (cdr (assoc :options expr))))
+                       ((eq :slots (first (first expr)))
+                        (rest (first expr)))
+                       ((eq :options (first (first expr)))
+                        (cons () (rest (first expr)))))))))
 
 (define-moonli-macro defclass
   ((name good-symbol)
@@ -97,14 +134,18 @@
 end"
    :lisp (defclass point () ()))
   (:moonli "defclass point():
-  metaclass: standard-class;
+  options:
+    metaclass: standard-class;
+  end
 end"
    :lisp (defclass point ()
            ()
            (:metaclass standard-class)))
   (:moonli "defclass point():
-  metaclass: standard-class,
-  documentation: \"A class for Points!\";
+  options:
+    metaclass: standard-class;
+    documentation: \"A class for Points!\";
+  end
 end"
    :lisp (defclass point ()
            ()
@@ -115,6 +156,14 @@ end"
   end
 end"
    :lisp (defclass point () ()))
+  (:moonli "defclass point():
+  slots:
+    x;
+    y;
+  end
+end"
+   :lisp (defclass point ()
+           ((x) (y))))
   (:moonli "defclass point():
   slots:
     x:
@@ -151,11 +200,12 @@ end"
       type: single-float,
       accessor: point-y;
   end
+  options:
+    metaclass: standard-class;
 
-  metaclass: standard-class,
+    documentation: \"Two dimensional points.\";
 
-  documentation: \"Two dimensional points.\";
-
+  end
 end"
    :lisp (defclass point ()
            ((x :initform 2.0 :type single-float :accessor point-x)
