@@ -120,7 +120,7 @@
 
 (define-moonli-macro defclass
   ((name good-symbol)
-   (direct-superclasses expr:list)
+   (direct-superclasses expr:function-arglist)
    (_ (and *whitespace/internal ":" *whitespace/all))
    (slots-and-options (esrap:? defclass/slots-and-options))
    (_ *whitespace/all))
