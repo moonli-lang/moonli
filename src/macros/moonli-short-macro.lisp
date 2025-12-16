@@ -72,3 +72,13 @@
    :moonli "declaim inline(foo)")
   (:lisp (declaim (type hash-table *map*))
    :moonli "declaim type(hash-table, *map*)"))
+
+(define-moonli-short-macro defgeneric
+  ((fun-name expr:symbol)
+   (_ *whitespace/internal)
+   (lambda-list lambda-parameter-list))
+  `(defgeneric ,fun-name ,lambda-list))
+
+(def-test defgeneric (short-macro-call)
+  (:lisp (defgeneric area (shape))
+   :moonli "defgeneric area(shape)"))
