@@ -59,14 +59,15 @@
                          :if-does-not-exist :create
                          :if-exists :supersede
                          :direction :output)
-      (format out ";;; This file was automatically generated.~%")
-      (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
-      (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
-      (dolist (form (cdr target))
-        (write form :stream out :case :downcase)
-        (terpri out)
-        (terpri out)))
-    (format *standard-output* "; wrote ~A~%" (namestring target-file))
+      (with-standard-io-syntax
+        (format out ";;; This file was automatically generated.~%")
+        (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
+        (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
+        (dolist (form (cdr target))
+          (write form :stream out :case :downcase)
+          (terpri out)
+          (terpri out)))
+      (format *standard-output* "; wrote ~A~%" (namestring target-file)))
     target-file))
 
 (defun compile-moonli-file (source-file fasl-file)
