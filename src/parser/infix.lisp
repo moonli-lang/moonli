@@ -39,26 +39,26 @@
 
 (esrap:defrule assignment
     (and chain
-         +whitespace/internal
+         +whitespace/all
          "="
-         +whitespace/internal
+         +whitespace/all
          infix-expression)
   (:function process-binary-infix-expression))
 
 (esrap:defrule disjunction
     (and conjunction
-         (* (and +whitespace/internal
+         (* (and +whitespace/all
                  "or"
-                 +whitespace/internal
+                 +whitespace/all
                  conjunction)))
   (:function process-nary-infix-expression)
   (:error-report nil))
 
 (esrap:defrule conjunction
     (and optional-negation
-         (* (and +whitespace/internal
+         (* (and +whitespace/all
                  "and"
-                 +whitespace/internal
+                 +whitespace/all
                  optional-negation)))
   (:function process-nary-infix-expression))
 
@@ -72,9 +72,9 @@
 
 (esrap:defrule comparison
     (and math-expression
-         (* (and +whitespace/internal
+         (* (and +whitespace/all
                  (or "<=" "<" "==" "!=" ">=" ">")
-                 +whitespace/internal
+                 +whitespace/all
                  math-expression)))
   (:function process-nary-infix-expression))
 
@@ -83,17 +83,17 @@
 
 (esrap:defrule sum
     (and product
-         (* (and +whitespace/internal
+         (* (and +whitespace/all
                  (or #\+ #\-)
-                 +whitespace/internal
+                 +whitespace/all
                  product)))
   (:function process-nary-infix-expression))
 
 (esrap:defrule product
     (and optional-expt
-         (* (and +whitespace/internal
+         (* (and +whitespace/all
                  (or #\* #\/)
-                 +whitespace/internal
+                 +whitespace/all
                  optional-expt)))
   (:function process-nary-infix-expression))
 
@@ -102,9 +102,9 @@
 
 (esrap:defrule expt
     (and optionally-typed-expression
-         +whitespace/internal
+         +whitespace/all
          #\^
-         +whitespace/internal
+         +whitespace/all
          optionally-typed-expression)
   (:function process-binary-infix-expression))
 

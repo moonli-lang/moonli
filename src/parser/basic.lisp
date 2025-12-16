@@ -115,6 +115,10 @@
     (* (or comment whitespace/end whitespace/internal))
   (:error-report nil))
 
+(esrap:defrule +whitespace/all
+    (+ (or comment whitespace/end whitespace/internal))
+  (:error-report nil))
+
 (esrap:defrule numeric-character (esrap:character-ranges (#\0 #\9))
   (:error-report :context))
 
