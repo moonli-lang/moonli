@@ -14,17 +14,15 @@
 
 (esrap:defrule chain
     (and atomic-expression
-         (* (and *whitespace/internal
-                 (or expr:function-arglist
-                     expr:vector))))
+         (* (or expr:function-arglist
+                expr:vector)))
   (:function (lambda (expr)
                (labels
                    ((build-prefix (expr)
                       (if (null (second expr))
                           (first expr)
-                          (destructuring-bind (first ((ws list/vector) &rest rest-rest))
+                          (destructuring-bind (first (list/vector &rest rest-rest))
                               expr
-                            (declare (ignore ws))
                             (build-prefix
                              (ecase (first list/vector)
                                (list
