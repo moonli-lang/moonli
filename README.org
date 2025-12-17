@@ -1,7 +1,7 @@
 #+title: Moonli Programming Language
 
 #+begin_quote
-Status: Explorative (pre-experimental). It is NOT ready for use in any project, not even if it is a throwaway project.
+Status: Experimental. Preferably, only use it in throwaway projects.
 
 If you are a lisper, see [[file:README-CL.org]].
 #+end_quote
