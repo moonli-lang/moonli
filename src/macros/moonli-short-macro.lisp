@@ -82,3 +82,11 @@
 (def-test defgeneric (short-macro-call)
   (:lisp (defgeneric area (shape))
    :moonli "defgeneric area(shape)"))
+
+(define-moonli-short-macro time
+  ((form moonli-expression))
+  `(time ,form))
+
+(def-test time (short-macro-call)
+  (:lisp (time (length "hello world"))
+   :moonli "time length(\"hello world\")"))
