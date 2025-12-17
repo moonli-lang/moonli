@@ -16,7 +16,7 @@ jobs:
           [ubuntu-24.04, ubuntu],
           [ubuntu-24.04-arm, ubuntu],
           [macos-latest, macos],
-          [macos-13, macos]
+          [macos-15-intel, macos]
         ]
     runs-on: ${{ matrix.runner_os[0] }}
 
