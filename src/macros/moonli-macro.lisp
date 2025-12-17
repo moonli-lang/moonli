@@ -183,3 +183,14 @@ end")
    :moonli "loop :for i :below n :do
   print(i + 1)
 end"))
+
+(define-moonli-macro deftype
+  ((name expr:symbol)
+   (_ *whitespace/internal)
+   (lambda-list lambda-parameter-list)
+   (_ *whitespace/internal)
+   (_ ":")
+   (_ *whitespace/all)
+   (body (esrap:? moonli)))
+  `(deftype ,name ,lambda-list
+     ,@(rest body)))
