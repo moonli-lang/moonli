@@ -1,5 +1,7 @@
 (in-package :moonli)
 
+(5am:in-suite :moonli)
+
 (esrap:defrule labels/definition
     (and expr:symbol
          *whitespace
