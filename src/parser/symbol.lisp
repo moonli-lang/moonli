@@ -23,10 +23,40 @@
   (:text t)
   (:function string-invert-case))
 
+(define-condition wrong-symbol-package (moonli-may-be-parse-error)
+  ((actual :initarg :actual)
+   (expected :initarg :expected))
+  (:report (lambda (c s)
+             (with-slots (actual expected) c
+               (format s "Did you mean to use ~S instead of ~S?"
+                       expected actual)))))
+
 (esrap:defrule expr:symbol
     (or (and #\: simple-symbol)
         (and simple-symbol #\: simple-symbol)
         (and simple-symbol))
+  (:around ()
+    (block macro-check
+      (let ((symbol (esrap:call-transform)))
+        (maphash (lambda (key value)
+                   (declare (ignore value))
+                   (when (and (string-equal key symbol)
+                              (not (eq (symbol-package key)
+                                       (symbol-package symbol))))
+                     (signal 'wrong-symbol-package
+                             :actual symbol :expected key)
+                     (return-from macro-check symbol)))
+                 *moonli-macro-functions*)
+        (maphash (lambda (key value)
+                   (declare (ignore value))
+                   (when (and (string-equal key symbol)
+                              (not (eq (symbol-package key)
+                                       (symbol-package symbol))))
+                     (signal 'wrong-symbol-package
+                             :actual symbol :expected key)
+                     (return-from macro-check symbol)))
+                 *moonli-short-macro-functions*)
+        symbol)))
   (:function (lambda (expr)
                (optima:match expr
                  ((list package-name ":" symbol-name)

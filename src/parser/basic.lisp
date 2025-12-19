@@ -32,9 +32,11 @@
              :reader parse-error-position)
    (expectation :initarg :expectation
                 :initform nil
-                :reader parse-error-expectations))
+                :reader parse-error-expectations)
+   (may-be-errors :initarg :may-be-errors
+                  :initform ()))
   (:report (lambda (c s)
-             (with-slots (position expectation) c
+             (with-slots (position expectation may-be-errors) c
                (if (boundp '*moonli-parse-string*)
                    (destructuring-bind (line col)
                        (position-to-line-column *moonli-parse-string* position)
@@ -52,7 +54,11 @@
                      (if expectation
                          (format s "Expected ~a" expectation)
                          (format s "Unexpected token."))))
+               (terpri s)
+               (format s "~%~{~A~^~%~}" may-be-errors)
                (terpri s)))))
+
+(define-condition moonli-may-be-parse-error (condition) ())
 
 (defstruct (comment (:constructor make-comment (depth string)))
   (depth 0)

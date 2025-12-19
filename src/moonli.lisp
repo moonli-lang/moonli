@@ -18,19 +18,29 @@
                        (dolist (ws_ ws)
                          (when ws_ (push ws_ exprs)))
                        (setf pos (or new-pos end)))
+          :with may-be-errors := nil
           :while (< pos end)
-          :do (multiple-value-bind (result next-pos success)
-                  (esrap:parse 'moonli-expression string
-                               :start pos :junk-allowed t)
-                (unless success
-                  (error 'moonli-parse-error :position pos))
-                (push result exprs)
-                (setf pos (or next-pos end))
-                (multiple-value-bind (ws new-pos)
-                    (esrap:parse '*whitespace/all string :start pos :junk-allowed t)
-                  (dolist (ws_ ws)
-                    (when ws_ (push ws_ exprs)))
-                  (setf pos (or new-pos end)))))
+          :do (handler-bind ((moonli-may-be-parse-error
+                               (lambda (c)
+                                 (push c may-be-errors))))
+                (multiple-value-bind (result next-pos success)
+                    (esrap:parse 'moonli-expression string
+                                 :start pos :junk-allowed t)
+                  (unless success
+                    (if (zerop pos)
+                        (esrap:parse 'moonli-expression string
+                                     :start pos)
+                        (error 'moonli-parse-error
+                               :position pos
+                               :may-be-errors may-be-errors)))
+                  (push result exprs)
+                  (setf pos (or next-pos end))
+                  (multiple-value-bind (ws new-pos)
+                      (esrap:parse '*whitespace/all string
+                                   :start pos :junk-allowed t)
+                    (dolist (ws_ ws)
+                      (when ws_ (push ws_ exprs)))
+                    (setf pos (or new-pos end))))))
     `(progn ,@(nreverse exprs))))
 
 (defun moonli-string-to-lisp-string (string)
