@@ -1,3 +1,6 @@
+(uiop:define-package :moonli-user
+  (:mix-reexport #:cl #:let-plus))
+
 (in-package :moonli)
 
 (unix-opts:define-opts

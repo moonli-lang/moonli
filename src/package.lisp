@@ -24,7 +24,7 @@
 
 
 (defpackage :moonli
-  (:use :cl)
+  (:use :cl :let-plus)
   (:export #:moonli
            #:moonli-expression
            #:read-moonli-from-stream
