@@ -67,18 +67,26 @@ end let"))
                   `(,condition ,@(rest statements)))))))
 
 (define-moonli-macro if
-  ((condition moonli-expression)
-   (_ (and *whitespace/internal mandatory-colon *whitespace))
-   (then-part moonli)
+  ((condition-then (and moonli-expression
+                        *whitespace/internal
+                        mandatory-colon
+                        *whitespace
+                        moonli))
    (_ *whitespace)
    (elif-clauses (* elif-clause))
-   (_ (esrap:? (and *whitespace "else" *whitespace/internal mandatory-colon *whitespace)))
-   (else-part (esrap:? moonli)))
-  `(cond (,condition
-          ,@(rest then-part))
-         ,@elif-clauses
-         (t
-          ,@(rest else-part))))
+   (else-part (esrap:? (and *whitespace
+                            "else"
+                            *whitespace/internal
+                            mandatory-colon
+                            *whitespace
+                            moonli))))
+  (let+ (((condition &ign &ign &ign then-part) condition-then)
+         ((&optional &ign &ign &ign &ign &ign else-part) else-part))
+    `(cond (,condition
+            ,@(rest then-part))
+           ,@elif-clauses
+           (t
+            ,@(rest else-part)))))
 
 
 (def-test if (macro-call)
