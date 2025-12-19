@@ -32,7 +32,8 @@
                              (:file "defpackage")
                              (:file "defstruct")
                              (:file "defclass")
-                             (:file "labels")))
+                             (:file "labels")
+                             (:file "let-plus")))
                (:file "moonli")
                (:file "pretty-printer")
                (:file "binary"))
@@ -53,7 +54,6 @@
   :depends-on ("uiop"
                "moonli"
                "cl-repl"
-               "let-plus"
                "for"
                "com.inuoe.jzon"
                "parse-float")
@@ -64,7 +64,6 @@
   :components ((:file "repl/package")
                (:module "extra-macros"
                 :components ((:file "short")
-                             (:file "let-plus")
                              (:file "for")))
                (:file "repl/main")))
 
