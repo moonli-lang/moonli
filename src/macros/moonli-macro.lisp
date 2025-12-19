@@ -3,7 +3,7 @@
 (5am:in-suite :moonli)
 
 (esrap:defrule let-binding
-    (and good-symbol
+    (and expr:symbol
          +whitespace
          #\=
          +whitespace
@@ -17,12 +17,11 @@
                      (fifth expr)))))
 
 (esrap:defrule let-bindings
-    (or (and let-binding
-             (* (and mandatory-comma
-                     +whitespace
-                     let-binding
-                     *whitespace)))
-        (* whitespace))
+    (and let-binding
+         (* (and ","
+                 +whitespace
+                 let-binding
+                 *whitespace)))
   (:function (lambda (expr)
                (if (null expr)
                    nil
@@ -33,7 +32,7 @@
 
   ((let-bindings let-bindings)
    (_ *whitespace/internal)
-   (_ mandatory-colon)
+   (_ ":")
    (let-body (esrap:? moonli)))
 
   `(let ,let-bindings

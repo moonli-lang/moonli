@@ -55,8 +55,8 @@
                (terpri s)))))
 
 (defstruct (comment (:constructor make-comment (depth string)))
-  depth
-  string)
+  (depth 0)
+  (string ""))
 
 (defmethod print-object ((c comment) s)
   (dotimes (i (comment-depth c))
@@ -67,9 +67,11 @@
     (and (+ #\#)
          (* (not (or #\newline #\return)))
          (or #\newline #\return))
+  (:error-report nil)
   (:function (lambda (expr)
-               (make-comment (length (first expr))
-                             (esrap:text (second expr))))))
+               (when expr
+                 (make-comment (length (first expr))
+                               (esrap:text (second expr)))))))
 
 (esrap:defrule whitespace/internal
     (or #\Space #\Tab)

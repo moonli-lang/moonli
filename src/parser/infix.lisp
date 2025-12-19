@@ -35,7 +35,8 @@
 
 (esrap:defrule infix-expression
     (or assignment
-        disjunction))
+        disjunction)
+  (:error-report nil))
 
 (esrap:defrule assignment
     (and chain
@@ -51,8 +52,7 @@
                  "or"
                  +whitespace/all
                  conjunction)))
-  (:function process-nary-infix-expression)
-  (:error-report nil))
+  (:function process-nary-infix-expression))
 
 (esrap:defrule conjunction
     (and optional-negation

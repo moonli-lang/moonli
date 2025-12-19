@@ -19,7 +19,8 @@
     (or comment
         macro-call
         short-macro-call
-        infix-expression))
+        infix-expression)
+  (:error-report t))
 
 (esrap:defrule moonli-expression/whitespace
     (and *whitespace
@@ -35,6 +36,7 @@
                  moonli-expression
                  *whitespace/internal))
          *whitespace/all)
+  (:error-report :detail)
   (:function (lambda (exprs)
                `(progn
                   ,(first (second exprs))
