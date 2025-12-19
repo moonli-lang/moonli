@@ -5,6 +5,7 @@
                "let-plus"
                "optima"
                "parse-number"
+               (:feature (:not :swank) "swank")
                "unix-opts")
   :licence "MIT"
   :author "Shubhamkar Ayare (digikar@proton.me)"

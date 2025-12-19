@@ -61,6 +61,15 @@
       (eval (read-moonli-from-string
              (alexandria:read-file-into-string moonli-file)))))
 
+(defun may-be-eval-form (form)
+  (let ((expanded (swank/backend:macroexpand-all form)))
+    (if (and (consp expanded)
+             (eq 'cl:eval-when (first expanded))
+             (or (member :compile-toplevel (second expanded))
+                 (member :load-toplevel (second expanded))))
+        (eval form)
+        form)))
+
 (defun transpile-moonli-file (moonli-file)
   (format *standard-output* "; transpiling ~A~%" (namestring moonli-file))
   (let* ((source (alexandria:read-file-into-string moonli-file))
@@ -73,14 +82,16 @@
                          :if-exists :supersede
                          :direction :output)
       (with-standard-io-syntax
-        (format out ";;; This file was automatically generated.~%")
-        (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
-        (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
-        (dolist (form (cdr target))
-          (write form :stream out :case :downcase)
-          (terpri out)
-          (terpri out)))
-      (format *standard-output* "; wrote ~A~%" (namestring target-file)))
+        (let ((*print-pretty* t))
+          (format out ";;; This file was automatically generated.~%")
+          (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
+          (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
+          (dolist (form (cdr target))
+            (write form :stream out :case :downcase)
+            (terpri out)
+            (terpri out)
+            (may-be-eval-form form)))
+        (format *standard-output* "; wrote ~A~%" (namestring target-file))))
     target-file))
 
 (defun compile-moonli-file (source-file fasl-file)
