@@ -1,13 +1,18 @@
 (in-package :moonli)
 
-(defun read-moonli-from-stream (stream)
+(defun read-moonli-from-stream (stream read-until-eof)
   (read-moonli-from-string
    (with-output-to-string (*standard-output*)
-     (loop :for line := (read-line stream)
-           :if (zerop (length line))
-             :do (return)
-           :else
-             :do (write-line line)))))
+     (if read-until-eof
+         (loop :while (listen stream)
+               :do (write-char (read-char stream)))
+         (loop :for line := (read-line stream nil)
+               :if (or (zerop (length line))
+                       (not (print (listen stream))))
+                 :do (return)
+               :else
+                 :do (when line
+                       (write-line line)))))))
 
 (defun read-moonli-from-string (string)
   "NOTE: Some moonli forms like defpackage and in-package can have side-effects."

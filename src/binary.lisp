@@ -57,6 +57,6 @@
   (let ((*package* (find-package :moonli-user)))
     (loop :initially (write-string "* ")
                      (force-output)
-          :for result := (eval (read-moonli-from-stream *standard-input*))
+          :for result := (eval (read-moonli-from-stream *standard-input* nil))
           :do (format t "~S~%* " result)
               (force-output))))
