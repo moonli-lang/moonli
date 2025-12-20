@@ -4,5 +4,5 @@
 Status: Experimental. Preferably, only use it in throwaway projects.
 #+end_quote
 
-See [moonli-lang.github.io](https://moonli-lang.github.io) for documentation.
+See [[https://moonli-lang.github.io][moonli-lang.github.io]] for documentation.
 
