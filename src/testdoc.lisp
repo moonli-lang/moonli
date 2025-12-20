@@ -31,23 +31,26 @@
   "Maps moonli macro names to example snippet transpilations defined in DEF-TEST forms.")
 
 (defun moonli-macro-transpilation-snippet (name format)
-  (ecase format
-    (:md
-     (with-output-to-string (*standard-output*)
-       (loop :for (moonli . lisp)
-               :in (gethash name *moonli-macro-transpilation-snippets*)
-             :do (format t "~%```moonli~%~A~%```~%" moonli)
-                 (format t "~%transpiles to~%")
-                 (let ((*print-case* :downcase))
-                   (format t "~%```common-lisp~%~A~%```~%" lisp)))))
-    (:org
-     (with-output-to-string (*standard-output*)
-       (loop :for (moonli . lisp)
-               :in (gethash name *moonli-macro-transpilation-snippets*)
-             :do (format t "~%#+begin_src moonli~%~A~%#+end_src~%" moonli)
-                 (format t "~%transpiles to~%")
-                 (let ((*print-case* :downcase))
-                   (format t "~%#+begin_src common-lisp~%~A~%#+end_src~%" lisp)))))))
+  (with-standard-io-syntax
+    (let ((*print-pretty* t)
+          (*package* (find-package :moonli)))
+      (ecase format
+        (:md
+         (with-output-to-string (*standard-output*)
+           (loop :for (moonli . lisp)
+                   :in (gethash name *moonli-macro-transpilation-snippets*)
+                 :do (format t "~%```moonli~%~a~%```~%" moonli)
+                     (format t "~%transpiles to~%")
+                     (let ((*print-case* :downcase))
+                       (format t "~%```common-lisp~%~s~%```~%" lisp)))))
+        (:org
+         (with-output-to-string (*standard-output*)
+           (loop :for (moonli . lisp)
+                   :in (gethash name *moonli-macro-transpilation-snippets*)
+                 :do (format t "~%#+begin_src moonli~%~a~%#+end_src~%" moonli)
+                     (format t "~%transpiles to~%")
+                     (let ((*print-case* :downcase))
+                       (format t "~%#+begin_src common-lisp~%~s~%#+end_src~%" lisp)))))))))
 
 (defmacro def-test (name (default-expr) &body target-transpilations)
   "Each element of TARGET-TRANSPILATIONS must be a plist with keys LISP and MOONLI. Optionally, it may have an entry for EXPR that overrides DEFAULT-EXPR"
