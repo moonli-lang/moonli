@@ -14,8 +14,18 @@
                  :do (when line
                        (write-line line)))))))
 
-(defun read-moonli-from-string (string)
-  "NOTE: Some moonli forms like defpackage and in-package can have side-effects."
+(defun read-moonli-from-string (string &optional read-partial)
+  "NOTE: Some moonli forms like defpackage and in-package can have side-effects.
+
+  If READ-PARTIAL is true, no error is raised, but the STRING is read until
+prior to transpilation errors.
+
+  Returns three values:
+
+- lisp expression
+- the position in string until which read succeeded
+- whether the entirety of STRING was read
+"
   (let ((end (length string))
         (pos 0)
         (exprs ())
@@ -32,31 +42,41 @@
                                (lambda (c)
                                  (push c may-be-errors))))
                 (multiple-value-bind (result next-pos success)
-                    (esrap:parse 'moonli-expression string
-                                 :start pos :junk-allowed t)
-                  (unless success
-                    (if (zerop pos)
-                        (esrap:parse 'moonli-expression string
-                                     :start pos)
-                        (error 'moonli-parse-error
-                               :position pos
-                               :may-be-errors may-be-errors)))
-                  (push result exprs)
-                  (setf pos (or next-pos end))
-                  (multiple-value-bind (ws new-pos)
-                      (esrap:parse '*whitespace/all string
-                                   :start pos :junk-allowed t)
-                    (dolist (ws_ ws)
-                      (when ws_ (push ws_ exprs)))
-                    (setf pos (or new-pos end))))))
-    `(progn ,@(nreverse exprs))))
+                    (alexandria:ignore-some-conditions
+                        (moonli-parse-error)
+                      (esrap:parse 'moonli-expression string
+                                   :start pos :junk-allowed t))
+                  (cond ((and (not success)
+                              (not read-partial))
+                         (if (zerop pos)
+                             (esrap:parse 'moonli-expression string
+                                          :start pos)
+                             (error 'moonli-parse-error
+                                    :position pos
+                                    :may-be-errors may-be-errors)))
+                        ((and (not success)
+                              read-partial)
+                         (return nil))
+                        (success
+                         (push result exprs)
+                         (setf pos (or next-pos end))
+                         (multiple-value-bind (ws new-pos)
+                             (esrap:parse '*whitespace/all string
+                                          :start pos :junk-allowed t)
+                           (dolist (ws_ ws)
+                             (when ws_ (push ws_ exprs)))
+                           (setf pos (or new-pos end))))))))
+    (values `(progn ,@(nreverse exprs))
+            pos
+            (= pos (length string)))))
 
 (defun moonli-string-to-lisp-string (string)
-  (let ((lisp-expr (ignore-errors (read-moonli-from-string string))))
+  (let ((lisp-expr (read-moonli-from-string string t)))
     (if lisp-expr
         (with-output-to-string (*standard-output*)
           (dolist (form (rest lisp-expr))
-            (write form :case :downcase)))
+            (write form :case :downcase)
+            (terpri)))
         string)))
 
 (defun load-moonli-file (moonli-file &key (transpile t))
