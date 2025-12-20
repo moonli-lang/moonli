@@ -6,13 +6,14 @@
      (if read-until-eof
          (loop :while (listen stream)
                :do (write-char (read-char stream)))
-         (loop :for line := (read-line stream nil)
-               :if (or (zerop (length line))
-                       (not (print (listen stream))))
+         (loop :for line := (read-line stream nil :end-of-file)
+               :if (and (stringp line)
+                        (zerop (length line)))
                  :do (return)
                :else
-                 :do (when line
-                       (write-line line)))))))
+                 :do (if (eq :end-of-file line)
+                         (uiop:quit)
+                         (write-line line)))))))
 
 (defun read-moonli-from-string (string &optional read-partial)
   "NOTE: Some moonli forms like defpackage and in-package can have side-effects.
