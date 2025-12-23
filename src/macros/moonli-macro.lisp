@@ -201,3 +201,7 @@ end"))
    (body (esrap:? moonli)))
   `(deftype ,name ,lambda-list
      ,@(rest body)))
+
+(define-moonli-macro progn
+  ((body (esrap:? moonli)))
+  body)
