@@ -41,7 +41,8 @@ prior to transpilation errors.
           :while (< pos end)
           :do (handler-bind ((moonli-may-be-parse-error
                                (lambda (c)
-                                 (push c may-be-errors))))
+                                 (push c may-be-errors)
+                                 (invoke-restart 'continue c))))
                 (multiple-value-bind (result next-pos success)
                     (alexandria:ignore-some-conditions
                         (moonli-parse-error)

@@ -43,18 +43,24 @@
                    (when (and (string-equal key symbol)
                               (not (eq (symbol-package key)
                                        (symbol-package symbol))))
-                     (signal 'wrong-symbol-package
-                             :actual symbol :expected key)
-                     (return-from macro-check symbol)))
+                     (restart-case
+                         (signal 'wrong-symbol-package
+                                 :actual symbol :expected key)
+                       (continue (&optional c)
+                         (declare (ignore c))
+                         (return-from macro-check symbol)))))
                  *moonli-macro-functions*)
         (maphash (lambda (key value)
                    (declare (ignore value))
                    (when (and (string-equal key symbol)
                               (not (eq (symbol-package key)
                                        (symbol-package symbol))))
-                     (signal 'wrong-symbol-package
-                             :actual symbol :expected key)
-                     (return-from macro-check symbol)))
+                     (restart-case
+                         (signal 'wrong-symbol-package
+                                 :actual symbol :expected key)
+                       (continue (&optional c)
+                         (declare (ignore c))
+                         (return-from macro-check symbol)))))
                  *moonli-short-macro-functions*)
         symbol)))
   (:function (lambda (expr)
