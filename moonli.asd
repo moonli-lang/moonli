@@ -74,3 +74,9 @@
   :depends-on ("moonli"
                "alive-lsp")
   :components ((:file "alive-lsp")))
+
+(defsystem "moonli/swank"
+  :pathname #p"src/"
+  :depends-on ("moonli"
+               (:feature (:not :swank) "swank"))
+  :components ((:file "swank")))
