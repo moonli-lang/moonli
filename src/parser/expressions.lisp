@@ -19,6 +19,7 @@
     (or comment
         macro-call
         short-macro-call
+        with
         infix-expression)
   (:error-report t))
 

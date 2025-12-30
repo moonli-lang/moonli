@@ -2,11 +2,15 @@
 
 (5am:in-suite :moonli)
 
+(esrap:defrule arglist
+    expr:function-arglist
+  (:function rest))
+
 (esrap:defrule expr:function-arglist
     (or (and #\( *whitespace moonli-expression *whitespace #\))
         expr:list)
   (:function (lambda (expr)
-               (optima:match expr
+               (optima:ematch expr
                  ((list "(" nil expr nil ")")
                   (list 'list expr))
                  ((list* 'list _)

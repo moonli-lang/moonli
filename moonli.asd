@@ -21,6 +21,7 @@
                              (:file "symbol")
                              (:file "hash-table-or-set")
                              (:file "macros")
+                             (:file "with")
                              (:file "misc")
                              (:file "infix")
                              (:file "vector")
