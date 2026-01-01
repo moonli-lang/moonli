@@ -65,7 +65,7 @@
   (string ""))
 
 (defmethod print-object ((c comment) s)
-  (format s "~%")
+  (format s "~&")
   (dotimes (i (comment-depth c))
     (write-char #\; s))
   (format s "~a~&" (comment-string c)))

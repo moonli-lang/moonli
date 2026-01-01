@@ -115,7 +115,7 @@ prior to transpilation errors.
           (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
           (dolist (form (cdr target))
             (write form :stream out :case :downcase)
-            (format out "~%~%")
+            (unless (comment-p form) (format out "~%~%"))
             (may-be-eval-form form)))
         (format *standard-output* "; wrote ~A~%" (namestring target-file))))
     target-file))
