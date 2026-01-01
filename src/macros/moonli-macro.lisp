@@ -86,13 +86,13 @@ end let"))
             ,@(rest then-part))
            ,@elif-clauses
            (t
-            ,@(rest else-part)))))
+            ,@(or (rest else-part) '(nil))))))
 
 
 (def-test if (macro-call)
-  (:lisp (cond (a b) (t))
+  (:lisp (cond (a b) (t nil))
    :moonli "if a: b end if")
-  (:lisp (cond (a b c) (t))
+  (:lisp (cond (a b c) (t nil))
    :moonli "if a:
   b; c
 end")
