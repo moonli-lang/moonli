@@ -9,7 +9,7 @@
                "unix-opts")
   :licence "MIT"
   :author "Shubhamkar Ayare (digikar@proton.me)"
-  :version "0.0.6"
+  :version "0.0.7"
   :pathname #p"src/"
   :serial t
   :components ((:file "package")
