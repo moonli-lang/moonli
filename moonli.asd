@@ -68,7 +68,16 @@
                (:module "extra-macros"
                 :components ((:file "short")
                              (:file "for")))
-               (:file "repl/main")))
+               (:file "repl/repl")))
+
+(defsystem "moonli/ciel"
+  :depends-on ("moonli/repl"
+               "ciel")
+  :build-operation "program-op"
+  :build-pathname "../moonli.ciel.repl"
+  :entry-point "cl-repl:main"
+  :pathname "src/"
+  :components ((:file "repl/ciel")))
 
 (defsystem "moonli/alive-lsp"
   :pathname #p"src/"

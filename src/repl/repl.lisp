@@ -1,7 +1,10 @@
 (in-package :cl-repl)
 
+;;; Generated using https://patorjk.com/software/taag/
+;;; Font: Doom, Text: "Moonli REPL"
+;;; Replace \ with \\
 (setf *logo*
-  "
+      "
 ___  ___                      _  _  ______  _____ ______  _
 |  \\/  |                     | |(_) | ___ \\|  ___|| ___ \\| |
 | .  . |  ___    ___   _ __  | | _  | |_/ /| |__  | |_/ /| |
