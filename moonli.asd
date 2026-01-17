@@ -39,12 +39,22 @@
                              (:file "match")))
                (:file "moonli")
                (:file "pretty-printer")
-               (:file "binary"))
+               (:file "binary")
+               (:file "contribs"))
   :perform (test-op (c s)
              (eval (read-from-string "(5AM:RUN! :MOONLI)")))
   :build-operation "program-op"
   :build-pathname "../moonli"
   :entry-point "moonli:main")
+
+#+sb-core-compression
+(defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
+  (eval (print
+         `(push :sb-aclrepl ,(find-symbol "*CONTRIB-BLACKLIST*" :moonli))))
+  (uiop:symbol-call :moonli '#:require-all-contribs)
+  (uiop:dump-image (asdf:output-file o c)
+                   :executable t
+                   :compression t))
 
 (defsystem "moonli/asdf"
   :depends-on ("moonli")
