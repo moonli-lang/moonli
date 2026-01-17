@@ -1,6 +1,8 @@
 (in-package :moonli)
 
-(define-moonli-short-macro ifelse
+(5am:in-suite :moonli)
+
+(define-moonli-short-macro moonli-user:ifelse
   ((test moonli-expression)
    (_ +whitespace/internal)
    (then moonli-expression)
@@ -8,11 +10,11 @@
    (else (esrap:? moonli-expression)))
   `(if ,test ,then ,else))
 
-(def-test ifelse (short-macro-call)
+(def-test moonli-user:ifelse (short-macro-call)
   (:lisp (if a 5 nil)
-   :moonli "ifelse a 5")
+   :moonli "moonli-user:ifelse a 5")
   (:lisp (if a :hello :bye)
-   :moonli "ifelse a :hello :bye"))
+   :moonli "moonli-user:ifelse a :hello :bye"))
 
 (define-moonli-short-macro lm
   ((lambda-list lambda-parameter-list)
