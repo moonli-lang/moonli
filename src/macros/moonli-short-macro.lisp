@@ -46,7 +46,7 @@
   ((decl-specs (and chain
                     (* (and *whitespace/internal
                             #\,
-                            *whitespace/internal
+                            *whitespace
                             chain)))))
   `(declare ,(first decl-specs)
             ,@(mapcar #'fourth (second decl-specs))))
