@@ -62,7 +62,7 @@ jobs:
 
     - name: Prepare moonli
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli")' --eval "(asdf:make :moonli)"
+        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli")' --eval '(asdf:make "moonli")'
         mv moonli ${{ env.CORE }}.exe
 
 
@@ -83,7 +83,7 @@ jobs:
 
     - name: Prepare moonli-cl-repl
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/repl")' --eval "(asdf:make :moonli/repl)"
+        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/repl")' --eval '(asdf:make "moonli/repl")'
         mv moonli.repl.exe ${{ env.REPL_CORE }}.exe
 
 
