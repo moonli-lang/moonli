@@ -34,6 +34,7 @@ jobs:
       run: |
         echo "CORE=moonli-${{ github.ref_name }}.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
         echo "REPL_CORE=moonli-${{ github.ref_name }}.cl-repl.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
+        echo "CIEL_CORE=moonli-${{ github.ref_name }}.ciel.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
 
     - name: Download implementation
       env:
@@ -99,3 +100,27 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         overwrite: 'true'
         files: ${{ env.REPL_CORE }}.exe
+
+
+    - name: Install ultralisp
+      run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
+
+    - name: Prepare moonli-ciel
+      run: |
+        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/ciel")' --eval '(asdf:make "moonli/ciel")'
+        mv moonli.ciel.exe ${{ env.CIEL_CORE }}.exe
+
+
+    - name: Upload moonli-ciel
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.CIEL_CORE }}.exe
+        path: ${{ env.CIEL_CORE }}.exe
+
+
+    - name: Publish moonli-ciel
+      uses: SierraSoftworks/gh-releases@v1.0.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        overwrite: 'true'
+        files: ${{ env.CIEL_CORE }}.exe
