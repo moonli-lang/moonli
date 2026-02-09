@@ -3,15 +3,6 @@
 (defpackage #:moonli/macro-predicates
   (:use))
 
-(defvar *moonli-macro-functions* (make-hash-table))
-(defun expand-moonli-macro (expression)
-  (funcall (car (gethash (first expression) *moonli-macro-functions*))
-           (rest expression)))
-
-(defvar *moonli-short-macro-functions* (make-hash-table))
-(defun expand-moonli-short-macro (expression)
-  (funcall (car (gethash (first expression) *moonli-short-macro-functions*))
-           (rest expression)))
 
 (defun namep-symbol (name)
   (intern (format nil "~A::~A"

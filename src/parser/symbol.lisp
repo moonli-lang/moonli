@@ -1,7 +1,8 @@
 (in-package :moonli)
 
 (defun string-invert-case (string)
-  (declare (optimize speed))
+  (declare (optimize speed)
+           (type string string))
   (let ((copy-text (copy-seq string)))
     (loop :for pos :below (length copy-text)
           :for char := (char copy-text pos)
@@ -30,6 +31,18 @@
              (with-slots (actual expected) c
                (format s "Did you mean to use ~S instead of ~S?"
                        expected actual)))))
+
+
+(defvar *moonli-macro-functions* (make-hash-table))
+(defun expand-moonli-macro (expression)
+  (funcall (car (gethash (first expression) *moonli-macro-functions*))
+           (rest expression)))
+
+(defvar *moonli-short-macro-functions* (make-hash-table))
+(defun expand-moonli-short-macro (expression)
+  (funcall (car (gethash (first expression) *moonli-short-macro-functions*))
+           (rest expression)))
+
 
 (esrap:defrule expr:symbol
     (or (and #\: simple-symbol)
@@ -79,10 +92,11 @@
                   (intern symbol-name)))))
   (:error-report :context))
 
+
 (defun good-symbol-p (symbol)
   ;; Excluding these symbols is necessary, otherwise parser
-  ;; cannot tell whether this symbol appears as syntactic part of the
-  ;; expression or semantic
+  ;; cannot tell whether this symbol appears as part of a macro
+  ;; or a variable or something else the
   (not (or (member symbol '(end elif else)
                    :test #'string-equal)
            (gethash symbol *moonli-macro-functions*)

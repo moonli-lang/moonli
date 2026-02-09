@@ -74,12 +74,10 @@ prior to transpilation errors.
 
 (defun moonli-string-to-lisp-string (string)
   (let ((lisp-expr (read-moonli-from-string string t)))
-    (if lisp-expr
-        (with-output-to-string (*standard-output*)
-          (dolist (form (rest lisp-expr))
-            (write form :case :downcase)
-            (terpri)))
-        string)))
+    (with-output-to-string (*standard-output*)
+      (dolist (form (rest lisp-expr))
+        (write form :case :downcase)
+        (terpri)))))
 
 (defun load-moonli-file (moonli-file &key (transpile t))
   (assert (string= "moonli" (pathname-type moonli-file)))
