@@ -205,3 +205,40 @@ end"))
 (define-moonli-macro progn
   ((body (esrap:? moonli)))
   body)
+
+(define-moonli-macro pprint-logical-block
+  ((ll arglist)
+   (_ *whitespace)
+   (_ #\:)
+   (_ *whitespace)
+   (body (esrap:? moonli)))
+  `(pprint-logical-block ,ll
+     ,@(rest body)))
+
+(def-test pprint-logical-block (macro-call)
+  (:lisp (pprint-logical-block (s nil :per-line-prefix "  ")
+           (write s)
+           (terpri))
+   :moonli "pprint-logical-block (s, nil, :per-line-prefix, \"  \"):
+              write(s)
+              terpri()
+            end"))
+
+(define-moonli-macro unwind-protect
+  ((protected moonli-expression)
+   (_ *whitespace)
+   (cleanup (esrap:? moonli)))
+  `(unwind-protect ,protected ,@(rest cleanup)))
+
+(def-test unwind-protect (macro-call)
+  (:lisp (unwind-protect (progn
+                           (setf s (+ s 2))
+                           (fn-call arg1 arg2))
+           (setf s (- s 2)))
+   :moonli "unwind-protect
+                progn
+                  s = s + 2
+                  fn-call(arg1, arg2)
+                end
+              s = s - 2
+            end"))
