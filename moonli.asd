@@ -75,8 +75,7 @@
   :pathname #p"src/"
   :components ((:file "repl/package")
                (:module "extra-macros"
-                :components ((:file "short")
-                             (:file "for")))
+                :components ((:file "for")))
                (:file "repl/repl")))
 
 (defsystem "moonli/ciel"
