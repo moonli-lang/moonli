@@ -6,11 +6,6 @@
     (and #\( *whitespace moonli-expression *whitespace #\))
   (:function third))
 
-(esrap:defrule quoted-expression
-    (and #\$ (or atomic-expression expr:symbol))
-  (:function (lambda (expr)
-               `(cl:quote ,(second expr)))))
-
 (esrap:defrule expr:character
     (and #\' character #\')
   (:function second))

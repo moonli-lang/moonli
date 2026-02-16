@@ -9,7 +9,7 @@
                "unix-opts")
   :licence "MIT"
   :author "Shubhamkar Ayare (digikar@proton.me)"
-  :version "0.0.7"
+  :version "0.0.8"
   :pathname #p"src/"
   :serial t
   :components ((:file "package")
@@ -22,6 +22,7 @@
                              (:file "hash-table-or-set")
                              (:file "macros")
                              (:file "with")
+                             (:file "quote")
                              (:file "misc")
                              (:file "infix")
                              (:file "vector")
