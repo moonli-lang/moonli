@@ -46,8 +46,9 @@ prior to transpilation errors.
                 (multiple-value-bind (result next-pos success)
                     (alexandria:ignore-some-conditions
                         (moonli-parse-error)
-                      (esrap:parse 'moonli-expression string
-                                   :start pos :junk-allowed t))
+                      (let ((*transpilation-character-offset* pos))
+                        (esrap:parse 'moonli-expression string
+                                     :start pos :junk-allowed t)))
                   (cond ((and (not success)
                               (not read-partial))
                          (if (zerop pos)

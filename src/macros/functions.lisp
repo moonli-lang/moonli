@@ -31,6 +31,38 @@
                    (cons (third expr) ; middle
                          (mapcar #'third (fifth expr)))))))
 
+(defvar *source-location* :moonli)
+(declaim (type (member :moonli :lisp) *source-location*))
+
+;; The inspiration for the following is sb-introspect::find-function-definition-source
+#+sbcl
+(defun update-defun-source-location (name char-offset)
+  ;; We update two things --
+  ;; 1. replace lisp file with moonli
+  ;; 2. update tlf in the fun-map of compiler-debug-fun
+  ;; tlf stands for top-level-form (probably)
+  (let* ((function (fdefinition name))
+         (debug-info (sb-introspect::function-debug-info function))
+         (debug-source (sb-c::debug-info-source debug-info))
+         (debug-fun (sb-di::fun-debug-fun function))
+         (compiler-debug-fun (sb-di::compiled-debug-fun-compiler-debug-fun debug-fun))
+         (tlf (sb-c::compiled-debug-fun-tlf-number compiler-debug-fun)))
+    (setf (sb-c::debug-source-namestring debug-source)
+          (namestring (make-pathname :defaults (sb-c::debug-source-namestring debug-source)
+                                     :type "moonli")))
+    ;; Irrelevant but useful comment: Only when tlf is set to nil, swank/sbcl::definition-source-file-location
+    ;; relies on character offset
+    (when tlf
+      (setf (elt (sb-di::debug-source-start-positions debug-source) tlf) char-offset))))
+
+#-sbcl
+(defun update-defun-source-location (name char-offset)
+  (declare (ignore name char-offset))
+  nil)
+
+;; TODO: Check whether swank/sbcl::definition-source-file-location,
+;; OR-order of character-offset matters
+
 (define-moonli-macro defun
   ((name good-symbol)
    (_ *whitespace)
@@ -38,8 +70,16 @@
    (_ *whitespace)
    (_ #\:)
    (body (esrap:? moonli)))
-  `(defun ,name ,lambda-list
-     ,@(rest body)))
+  (let ((fn-form `(defun ,name ,lambda-list
+                    ,@(rest body))))
+    (when (and (eq :moonli *source-location*)
+               (boundp '*transpilation-definition-source-form-table*)
+               (boundp '*transpilation-character-offset*))
+      (setf (gethash fn-form *transpilation-definition-source-form-table*)
+            `(,name
+              ,*transpilation-line-number*
+              ,*transpilation-character-offset*)))
+    fn-form))
 
 
 (def-test defun (macro-call)
