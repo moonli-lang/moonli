@@ -2,17 +2,25 @@
 
 (5am:in-suite :moonli)
 
+(esrap:defrule defpackage/option/arg
+    (or (and string-designator +whitespace/internal #\= +whitespace/internal string-designator)
+        string-designator)
+  (:function (lambda (expr)
+               (if (atom expr)
+                   expr
+                   (list (first expr) (fifth expr))))))
+
 (esrap:defrule defpackage/option
     (and string-designator
          *whitespace
-         (esrap:? (or (and string-designator
+         (esrap:? (or (and defpackage/option/arg
                            *whitespace
                            (* (and #\,
                                    *whitespace
-                                   string-designator
+                                   defpackage/option/arg
                                    *whitespace)))
                       (+ (and *whitespace
-                              string-designator
+                              defpackage/option/arg
                               *whitespace
                               #\,
                               *whitespace))))
@@ -38,5 +46,7 @@
 (def-test defpackage (macro-call)
   (:moonli "defpackage foo
   :use cl;
+  :local-nicknames :a = :alexandria;
 end"
-   :lisp (defpackage foo (:use cl))))
+   :lisp (defpackage foo (:use cl)
+                     (:local-nicknames (:a :alexandria)))))
