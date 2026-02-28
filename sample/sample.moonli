@@ -11,13 +11,23 @@ in-package :moonli-sample
 
 ## Define a function
 defun foo(x):
-    x
+  error("Ha! ~a", x)
+end
+
+defun bar():
+  42
+end
+
+defun foobar():
+  "Wonderful!"
 end
 
 ## Define a global variable
 defvar moonli-sample:foo = $abc;
 
 print(*package*)
+
+
 print(foo)
 format(t, "hello! ~s: ~a~%", $foo, foo)
 
