@@ -83,7 +83,10 @@ prior to transpilation errors.
 (defun load-moonli-file (moonli-file &key (transpile t))
   (assert (string= "moonli" (pathname-type moonli-file)))
   (if transpile
-      (load (transpile-moonli-file moonli-file))
+      (multiple-value-bind (lisp-file debug-file)
+          (transpile-moonli-file moonli-file)
+        (load lisp-file)
+        (load debug-file))
       (eval (read-moonli-from-string
              (alexandria:read-file-into-string moonli-file)))))
 
@@ -100,6 +103,8 @@ prior to transpilation errors.
   (format *standard-output* "; transpiling ~A~%" (namestring moonli-file))
   (let* ((source (alexandria:read-file-into-string moonli-file))
          (target-file (make-pathname :defaults moonli-file :type "lisp"))
+         (debug-file (make-pathname :defaults moonli-file :type "debug.lisp"))
+         (debug-loc  nil)
          (*transpilation-line-number* 0)
          (*transpilation-character-offset* 0)
          (*transpilation-definition-source-form-table* (make-hash-table :test #'equal))
@@ -110,21 +115,48 @@ prior to transpilation errors.
                          :if-does-not-exist :create
                          :if-exists :supersede
                          :direction :output)
-      (with-standard-io-syntax
-        (let ((*print-pretty* t))
-          (format out ";;; This file was automatically generated.~%")
-          (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
-          (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
-          (dolist (form (cdr target))
-            (write form :stream out :case :downcase)
-            (unless (comment-p form) (format out "~%~%"))
-            (may-be-eval-form form)))
+      (with-open-file (debug debug-file
+                             :if-does-not-exist :create
+                             :if-exists :supersede
+                             :direction :output)
+        (let ((*package* (find-package :moonli)))
+          (write `(in-package :moonli) :stream debug :case :downcase)
+          (terpri debug))
+        (with-standard-io-syntax
+          (let ((*print-pretty* t))
+            (format out ";;; This file was automatically generated.~%")
+            (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
+            (format out ";;; Edit or Replace the corrsponding .moonli file instead!~%~%")
+            (dolist (form (cdr target))
+              (write form :stream out :case :downcase)
+              (unless (comment-p form) (terpri out))
+              (when (gethash form *transpilation-definition-source-form-table*)
+                (push (third (gethash form *transpilation-definition-source-form-table*))
+                      debug-loc))
+              (unless (comment-p form) (format out "~%"))
+              (may-be-eval-form form))))
+        (with-standard-io-syntax
+          (let* ((*print-pretty* t)
+                 (*package* (find-package :moonli)))
+            (loop :for form :in (cdr target)
+                  :for debug-info := (gethash form *transpilation-definition-source-form-table*)
+                  :if debug-info
+                    :do (destructuring-bind (name line char) debug-info
+                          (declare (ignore line))
+                          (write `(update-defun-source-location ',name ,char)
+                                 :stream debug
+                                 :case :downcase)
+                          (terpri debug)))))
         (format *standard-output* "; wrote ~A~%" (namestring target-file))))
-    target-file))
+    (values target-file debug-file)))
 
 (defun compile-moonli-file (source-file fasl-file)
-  (let ((lisp-source-file (transpile-moonli-file source-file)))
-    (asdf:compile-file* lisp-source-file :output-file fasl-file)))
+  (multiple-value-bind (lisp-source-file debug-file)
+      (transpile-moonli-file source-file)
+    (asdf:compile-file* lisp-source-file :output-file fasl-file)
+    (asdf:compile-file* debug-file
+                        :output-file (make-pathname :defaults fasl-file
+                                                    :type (uiop:strcat "debug." (pathname-type fasl-file))))))
 
 #|
 1. We want an extensible system to recognize moonli macros such as "LET". ; ;
