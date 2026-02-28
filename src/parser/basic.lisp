@@ -2,6 +2,11 @@
 
 (defvar *moonli-parse-string*)
 
+(defvar *transpilation-line-number*)
+(defvar *transpilation-character-offset*)
+
+(defvar *transpilation-definition-source-form-table*)
+
 (defun position-to-line-column (text position)
   (let ((line (count #\newline text :end position))
         (col  (- position
@@ -95,13 +100,22 @@
   (:constant nil)
   (:error-report nil))
 
+(esrap:defrule whitespace/newline
+    (or #\newline #\return)
+  (:constant nil)
+  (:error-report nil)
+  (:around ()
+    (esrap:call-transform)
+    (when (boundp '*transpilation-line-number*)
+      (incf *transpilation-line-number*))))
+
 (esrap:defrule whitespace/end
-    (or comment #\newline #\return #\;)
+    (or comment whitespace/newline #\;)
   (:constant nil)
   (:error-report nil))
 
 (esrap:defrule whitespace
-    (or comment #\space #\tab #\newline #\return)
+    (or comment #\space #\tab whitespace/newline)
   (:constant nil)
   (:error-report nil))
 
