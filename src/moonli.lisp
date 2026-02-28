@@ -166,6 +166,33 @@ prior to transpilation errors.
         (format *standard-output* "; wrote ~A~%" (namestring target-file))))
     (values target-file debug-file)))
 
+(defmethod definitions/swank:offset-from-file-and-form-number
+    (form-number file-name (type (eql :moonli)))
+  (with-open-file (f file-name :direction :input)
+    (let ((*read-eval* nil))
+      ;; Skip some forms
+      (loop :with i := 0
+            :while (< i form-number)
+            :do (multiple-value-bind (form success)
+                    (handler-case
+                        (values (read-moonli-from-stream f nil) t)
+                      ((or esrap:esrap-parse-error
+                           moonli-parse-error)
+                          ()
+                        (values nil nil)))
+                  (when (and success
+                             (not (comment-p form)))
+                    (incf i))))
+      ;; Go to the next non-whitespace and non-comment character
+      (loop :for next-char := (peek-char t f nil nil nil)
+            :do (cond ((member next-char '(#\newline #\return #\tab #\space))
+                       (read-char f nil nil nil))
+                      ((char= #\# next-char)
+                       (read-line f nil nil nil))
+                      (t
+                       (return-from definitions/swank:offset-from-file-and-form-number
+                         (1+ (file-position f)))))))))
+
 (defun compile-moonli-file (source-file fasl-file)
   (multiple-value-bind (lisp-source-file debug-file)
       (transpile-moonli-file source-file)

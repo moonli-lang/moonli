@@ -1,3 +1,4 @@
 ("asdf" :git "https://gitlab.common-lisp.net/asdf/asdf.git")
 ("cl-repl" :git "https://github.com/lisp-maintainers/cl-repl")
+("definitions" :git "https://codeberg.org/digikar/definitions.git" :branch "swank")
 ("peltadot" :git "https://gitlab.com/digikar/peltadot")

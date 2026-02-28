@@ -1,6 +1,7 @@
 (defsystem "moonli"
   :depends-on ("alexandria"
                "esrap"
+               "definitions/swank"
                "fiveam"
                "let-plus"
                "optima"
