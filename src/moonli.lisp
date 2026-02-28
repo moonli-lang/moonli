@@ -1,19 +1,35 @@
 (in-package :moonli)
 
 (defun read-moonli-from-stream (stream read-until-eof)
-  (read-moonli-from-string
-   (with-output-to-string (*standard-output*)
-     (if read-until-eof
-         (loop :while (listen stream)
-               :do (write-char (read-char stream)))
-         (loop :for line := (read-line stream nil :end-of-file)
-               :if (and (stringp line)
-                        (zerop (length line)))
-                 :do (return)
-               :else
-                 :do (if (eq :end-of-file line)
-                         (uiop:quit)
-                         (write-line line)))))))
+  (loop :with initial-input := (make-array 0
+                                           :element-type 'character
+                                           :fill-pointer t)
+        :with results := nil
+        :until
+        (handler-case
+            (progn
+              (setf initial-input
+                    (or (with-output-to-string (s initial-input)
+                          (if read-until-eof
+                              (loop :while (listen stream)
+                                    :do (write-char (read-char stream) s))
+                              (loop :for line := (read-line stream nil :end-of-file)
+                                    :if (and (stringp line)
+                                             (zerop (length line)))
+                                      :do (return)
+                                    :else
+                                      :do (if (eq :end-of-file line)
+                                              (uiop:quit)
+                                              (write-line line s)))))
+                        initial-input))
+              (setf results
+                    (nconc results
+                           (rest (read-moonli-from-string initial-input)))))
+          ((or moonli-parse-error
+               esrap:esrap-parse-error)
+              ()
+            nil))
+        :finally (return `(progn ,@results))))
 
 (defun read-moonli-from-string (string &optional read-partial)
   "NOTE: Some moonli forms like defpackage and in-package can have side-effects.
