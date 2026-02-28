@@ -108,7 +108,7 @@ end"))
              *whitespace/internal
              "::"
              *whitespace/internal
-             (or expr:symbol expr:list))
+             atomic-expression)
         expr:symbol)
   (:function (lambda (args)
                (if (consp args)
@@ -193,4 +193,9 @@ end"
   uiop:strcat(x, y)
 end"
    :lisp (defmethod add ((x string) y)
-           (uiop:strcat x y))))
+           (uiop:strcat x y)))
+  (:moonli "defmethod add (x :: string, y :: eql($string)):
+  concatenate(y, x)
+end"
+   :lisp (defmethod add ((x string) (y (eql 'string)))
+           (concatenate y x))))
