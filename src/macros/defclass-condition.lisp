@@ -212,3 +212,14 @@ end"
             (y :initform 2.0 :type single-float :accessor point-y))
            (:metaclass standard-class)
            (:documentation "Two dimensional points."))))
+
+(define-moonli-macro define-condition
+  ((name good-symbol)
+   (direct-superclasses expr:function-arglist)
+   (_ (and *whitespace/internal ":" *whitespace/all))
+   (slots-and-options (esrap:? defclass/slots-and-options))
+   (_ *whitespace/all))
+  `(define-condition ,name ,(rest direct-superclasses)
+     ,@(if (null slots-and-options)
+           `(())
+           slots-and-options)))

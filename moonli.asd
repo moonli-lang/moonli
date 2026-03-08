@@ -35,7 +35,7 @@
                              (:file "functions")
                              (:file "defpackage")
                              (:file "defstruct")
-                             (:file "defclass")
+                             (:file "defclass-condition")
                              (:file "labels")
                              (:file "let-plus")
                              (:file "match")))
