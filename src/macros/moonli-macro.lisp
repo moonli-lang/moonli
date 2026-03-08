@@ -51,6 +51,15 @@ end")
 end let"))
 
 
+(define-moonli-macro handler-bind
+  ((bindings let-bindings)
+   (_ *whitespace/internal)
+   (_ ":")
+   (body (esrap:? moonli)))
+
+  `(handler-bind ,bindings
+     ,@(rest body)))
+
 
 (esrap:defrule elif-clause
     (and *whitespace
@@ -223,6 +232,15 @@ end"))
               write(s)
               terpri()
             end"))
+
+(define-moonli-macro print-unreadable-object
+  ((ll arglist)
+   (_ *whitespace)
+   (_ #\:)
+   (_ *whitespace)
+   (body (esrap:? moonli)))
+  `(print-unreadable-object ,ll
+     ,@(rest body)))
 
 (define-moonli-macro unwind-protect
   ((protected moonli-expression)
