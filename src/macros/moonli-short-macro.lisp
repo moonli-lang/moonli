@@ -4,11 +4,13 @@
 
 (define-moonli-short-macro defvar
   ((name good-symbol)
-   (_ +whitespace/internal)
-   (_ "=")
-   (_ +whitespace/internal)
-   (value moonli-expression))
-  `(defvar ,name ,value))
+   (value (esrap:? (and +whitespace/internal
+                        "="
+                        +whitespace/internal
+                        moonli-expression))))
+  (if value
+      `(defvar ,name ,(fourth value))
+      `(defvar ,name)))
 
 (def-test defvar (short-macro-call)
   (:lisp (defvar a 5)
