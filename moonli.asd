@@ -74,6 +74,7 @@
   :build-pathname "../moonli.repl"
   :entry-point "cl-repl:main"
   :pathname #p"src/"
+  :license "GPL3v3" ;; due to cl-repl
   :components ((:file "repl/package")
                (:module "extra-macros"
                 :components ((:file "for")))
@@ -86,6 +87,7 @@
   :build-pathname "../moonli.ciel"
   :entry-point "cl-repl:main"
   :pathname "src/"
+  :license "GPL3v3" ;; due to cl-repl
   :components ((:file "repl/ciel")))
 
 (defsystem "moonli/alive-lsp"
