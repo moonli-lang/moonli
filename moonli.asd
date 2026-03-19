@@ -80,6 +80,13 @@
                 :components ((:file "for")))
                (:file "repl/repl")))
 
+(defsystem "moonli/coalton"
+  :depends-on ("moonli"
+               "coalton")
+  :pathname #p"src/extra-macros/"
+  :components ((:file "coalton")))
+
+
 (defsystem "moonli/ciel"
   :depends-on ("moonli/repl"
                "ciel")

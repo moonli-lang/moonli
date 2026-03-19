@@ -72,8 +72,9 @@
 (def-test declaim (short-macro-call)
   (:lisp (declaim (inline foo))
    :moonli "declaim inline(foo)")
+  ;; TODO: Check ftype with &key
   (:lisp (declaim (type hash-table *map*))
-   :moonli "declaim type(hash-table, *map*)"))
+      :moonli "declaim type(hash-table, *map*)"))
 
 (define-moonli-short-macro defgeneric
   ((fun-name expr:symbol)
