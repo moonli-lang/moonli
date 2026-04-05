@@ -97,7 +97,8 @@ prior to transpilation errors.
         (terpri)))))
 
 (defun load-moonli-file (moonli-file &key (transpile t))
-  (assert (string= "moonli" (pathname-type moonli-file)))
+  (when (pathname-type moonli-file)
+    (assert (string= "moonli" (pathname-type moonli-file))))
   (if transpile
       (multiple-value-bind (lisp-file debug-file)
           (transpile-moonli-file moonli-file)
