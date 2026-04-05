@@ -51,8 +51,7 @@
 
 #+sb-core-compression
 (defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
-  (eval (print
-         `(push :sb-aclrepl ,(find-symbol "*CONTRIB-BLACKLIST*" :moonli))))
+  (eval `(push :sb-aclrepl ,(find-symbol "*CONTRIB-BLACKLIST*" :moonli)))
   (uiop:symbol-call :moonli '#:require-all-contribs)
   (uiop:dump-image (asdf:output-file o c)
                    :executable t
@@ -66,18 +65,21 @@
 (defsystem "moonli/repl"
   :depends-on ("uiop"
                "moonli"
-               "cl-repl"
+               "isocline-repl"
                "for"
                "com.inuoe.jzon"
-               "parse-float")
+               "parse-float"
+               "trivial-package-local-nicknames")
   :build-operation "program-op"
   :build-pathname "../moonli.repl"
-  :entry-point "cl-repl:main"
+  :entry-point "moonli/repl:main"
   :pathname #p"src/"
-  :license "GPL3v3" ;; due to cl-repl
+  :license "MIT"
+  :serial t
   :components ((:file "repl/package")
                (:module "extra-macros"
                 :components ((:file "for")))
+               (:file "repl/opts")
                (:file "repl/repl")))
 
 (defsystem "moonli/ciel"
@@ -87,7 +89,7 @@
   :build-pathname "../moonli.ciel"
   :entry-point "cl-repl:main"
   :pathname "src/"
-  :license "GPL3v3" ;; due to cl-repl
+  :license "MIT"
   :components ((:file "repl/ciel")))
 
 (defsystem "moonli/alive-lsp"
