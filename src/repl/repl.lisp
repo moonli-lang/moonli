@@ -72,7 +72,7 @@ ___  ___                      _  _  ______  _____ ______  _
       (asdf:initialize-source-registry (list :source-registry
                                              (list :directory (uiop:getcwd))
                                              :inherit-configuration))
-
-
       (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
+      (ic:set-prompt-marker "> " "")
+      (ic:enable-multiline-indent nil)
       (ic-repl:repl))))
