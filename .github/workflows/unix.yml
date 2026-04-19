@@ -8,12 +8,12 @@ jobs:
 
     strategy:
       matrix:
-        lisp: [sbcl]
+        lisp: [sbcl_static]
         runner_os: [
-          [ubuntu-24.04, ubuntu],
-          [ubuntu-24.04-arm, ubuntu],
-          [macos-latest, macos],
-          [macos-15-intel, macos]
+          [ubuntu-24.04, linux],
+          [ubuntu-24.04-arm, linux],
+          [macos-latest, darwin],
+          [macos-15-intel, darwin]
         ]
     runs-on: ${{ matrix.runner_os[0] }}
 
@@ -36,7 +36,7 @@ jobs:
     - name: Add $CORE, $REPL_CORE, $CIEL_CORE
       run: |
         echo "CORE=moonli-${{ github.ref_name }}.${{ matrix.runner_os[1] }}.$(uname -m)" >> $GITHUB_ENV
-        echo "REPL_CORE=moonli-${{ github.ref_name }}.cl-repl.${{ matrix.runner_os[1] }}.$(uname -m)" >> $GITHUB_ENV
+        echo "REPL_CORE=moonli-${{ github.ref_name }}.repl.${{ matrix.runner_os[1] }}.$(uname -m)" >> $GITHUB_ENV
         echo "CIEL_CORE=moonli-${{ github.ref_name }}.ciel.${{ matrix.runner_os[1] }}.$(uname -m)" >> $GITHUB_ENV
 
     - name: Download implementation
@@ -46,6 +46,14 @@ jobs:
       run: |
         pwd
         ls -l
+        case $(uname -m) in
+            x86_64) ARCH="x86-64" ;;
+            arm64|aarch64) ARCH="arm64";;
+            *) ARCH=$(uname -m) ;;
+        esac
+        echo "ARCH=${ARCH}" >> ${GITHUB_ENV}
+        echo "OS=${OS}" >> ${GITHUB_ENV}
+        bash --version
         bash <(curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh)
 
     - name: Download download-dependencies
@@ -60,13 +68,56 @@ jobs:
            --eval '(let ((*dependencies-home* (second ql:*local-project-directories*))) (ensure-system "moonli/repl"))'
         ls $HOME/quicklisp/local-projects/
 
-    - name: Install readline (macos)
-      if: startsWith(matrix.runner_os[1], 'macos')
-      run: brew link readline --force
+    - name: Compile isocline
+      run: |
+        pwd
+        cd $HOME/quicklisp/local-projects/cl-isocline/isocline
+        mkdir -p build/release
+        cd build/release
+        cmake ../..
+        cmake --build .
+
+    - name: Install libssl libtls
+      run: |
+        if [ "$OS" == "linux" ]; then
+            sudo apt install -y openssl libssl-dev libtls-dev atool
+        elif [ "$OS" == "darwin" ]; then
+            brew install openssl libretls atool
+        fi
+
+    - name: Statically link against libisocline + libcrypto, libssl, libtls
+      run: |
+        case ${OS} in
+            linux) SYS_LIBDIR="/usr/lib/" ;;
+            darwin) SYS_LIBDIR="$(brew --prefix)" ;;
+        esac
+
+        LIBCRYPTO=$(find $SYS_LIBDIR -name "libcrypto.a" | head -1)
+        LIBSSL=$(find $SYS_LIBDIR -name "libssl.a" | head -1)
+        LIBTLS=$(find $SYS_LIBDIR -name "libtls.a" | head -1)
+        LIBISOCLINE="$HOME/quicklisp/local-projects/cl-isocline/isocline/build/release/libisocline.a"
+
+        if [ "$OS" == "linux" ]; then
+            SBCL_DIR="/home/runner/sbcl-2.6.3+r00-$ARCH-$OS"
+            export WHOLE_ARCHIVES="-Wl,--whole-archive $LIBCRYPTO $LIBSSL $LIBTLS $LIBISOCLINE"
+        elif [ "$OS" == "darwin" ]; then
+            SBCL_DIR="/Users/runner/sbcl-2.6.3+r00-$ARCH-$OS"
+            # -force_load only works on one library at a time
+            export WHOLE_ARCHIVES="-Wl,-force_load $LIBCRYPTO -Wl,-force_load $LIBSSL -Wl $LIBTLS -Wl,-force_load $LIBISOCLINE"
+        fi
+
+        cd "$SBCL_DIR"
+        make -C "src/runtime" -f binaries.mk sbcl.extras
+        mv "src/runtime/sbcl.extras" "src/runtime/sbcl"
+        echo "SBCL_DIR=${SBCL_DIR}" >> ${GITHUB_ENV}
+
+    ## Below steps are for dumping and uploading
 
     - name: Prepare moonli
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli")' --eval "(asdf:make :moonli)"
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+           --eval '(ql:quickload "moonli")' \
+           --eval "(asdf:make :moonli)"
         mv moonli ${{ env.CORE }}.bin
 
 
@@ -78,6 +129,7 @@ jobs:
 
 
     - name: Publish moonli
+      if: startsWith(github.ref, 'refs/tags/')
       uses: SierraSoftworks/gh-releases@v1.0.4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -85,20 +137,24 @@ jobs:
         files: ${{ env.CORE }}.bin
 
 
-    - name: Prepare moonli-cl-repl
+    - name: Prepare moonli-repl
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/repl")' --eval "(asdf:make :moonli/repl)"
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+           --eval '(ql:quickload "moonli/repl")' \
+           --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+           --eval "(asdf:make :moonli/repl)"
         mv moonli.repl ${{ env.REPL_CORE }}.bin
 
 
-    - name: Upload moonli-cl-repl
+    - name: Upload moonli-repl
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.REPL_CORE }}.bin
         path: ${{ env.REPL_CORE }}.bin
 
 
-    - name: Publish moonli-cl-repl
+    - name: Publish moonli-repl
+      if: startsWith(github.ref, 'refs/tags/')
       uses: SierraSoftworks/gh-releases@v1.0.4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -111,12 +167,19 @@ jobs:
 
 
     - name: Prepare moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/ciel")' --eval '(asdf:make "moonli/ciel")'
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+            --eval '(ql:quickload "moonli/ciel")' \
+            --eval "(cffi:close-foreign-library 'isocline::libisocline)" \            
+            --eval '(asdf:make "moonli/ciel")'
         mv moonli.ciel ${{ env.CIEL_CORE }}.bin
 
 
     - name: Upload moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.CIEL_CORE }}.bin
@@ -124,6 +187,8 @@ jobs:
 
 
     - name: Publish moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
       uses: SierraSoftworks/gh-releases@v1.0.4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
