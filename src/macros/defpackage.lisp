@@ -29,11 +29,15 @@
   (:function (lambda (expr)
                (optima:ematch expr
                  ((list option-name _ args _ _)
-                  `(,(intern (string-upcase option-name) :keyword)
-                    ,@(if (null (nthcdr 3 args)) ; length=3, first option
-                          (cons (first args)
-                                (mapcar #'third (third args)))
-                          (mapcar #'second args))))))))
+                  (let* ((option (intern (string-upcase option-name) :keyword))
+                         (args (if (null (nthcdr 3 args)) ; length=3, first option
+                                   (cons (first args)
+                                         (mapcar #'third (third args)))
+                                   (mapcar #'second args)))
+                         (args (if (eq :export option)
+                                   (mapcar (lambda (s) (make-symbol (string s))) args)
+                                   args)))
+                    `(,option ,@args)))))))
 
 (define-moonli-macro defpackage
   ((name string-designator)
