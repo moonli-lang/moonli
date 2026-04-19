@@ -1,7 +1,4 @@
-on:
-  push:
-    tags:
-      - '*'
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
 
@@ -13,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        lisp: [sbcl]
+        lisp: [sbcl_static]
         os: [windows]
 
     defaults:
@@ -25,7 +22,7 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
       with:
-        install: libzstd-devel git curl
+        install: git curl zip gcc atool libzstd-devel mingw-w64-x86_64-zstd mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-x86_64-github-cli
 
     - name: Check $PATH
       run: echo $PATH
@@ -33,7 +30,7 @@ jobs:
     - name: Add $CORE and $REPL_CORE
       run: |
         echo "CORE=moonli-${{ github.ref_name }}.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
-        echo "REPL_CORE=moonli-${{ github.ref_name }}.cl-repl.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
+        echo "REPL_CORE=moonli-${{ github.ref_name }}.repl.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
         echo "CIEL_CORE=moonli-${{ github.ref_name }}.ciel.${{ matrix.os }}.$(uname -m)" >> $GITHUB_ENV
 
     - name: Download implementation
@@ -59,10 +56,32 @@ jobs:
            --eval '(let ((*dependencies-home* (second ql:*local-project-directories*))) (ensure-system "moonli/repl"))'
         ls $HOME/quicklisp/local-projects/
 
+    - name: Compile isocline
+      run: |
+        pwd
+        cd $HOME/quicklisp/local-projects/cl-isocline/isocline/
+        mkdir -p build/release
+        cd build/release
+        cmake ../..
+        cmake --build .
 
+    - name: Statically link against libisocline + libcrypto, libssl
+      run: |
+        SBCL_DIR="sbcl-2.6.3+r00-x86-64-windows"
+        SYS_LIBDIR="/mingw64/lib"
+        LIBCRYPTO="${SYS_LIBDIR}/libcrypto.a ${SYS_LIBDIR}/libcrypt32.a"
+        LIBSSL=${SYS_LIBDIR}/libssl.a
+        LIBISOCLINE="$HOME/quicklisp/local-projects/cl-isocline/isocline/build/release/libisocline.a"
+        export WHOLE_ARCHIVES="-Wl,--whole-archive $LIBSSL -Wl,--no-whole-archive $LIBCRYPTO -Wl,--whole-archive $LIBISOCLINE"
+        cd "/home/runneradmin/$SBCL_DIR"
+        make -C "src/runtime" -f binaries.mk sbcl.extras
+        mv "src/runtime/sbcl.extras" "src/runtime/sbcl"
+        
     - name: Prepare moonli
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli")' --eval '(asdf:make "moonli")'
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+           --eval '(ql:quickload "moonli")' \
+           --eval '(asdf:make "moonli")'
         mv moonli ${{ env.CORE }}.exe
 
 
@@ -74,6 +93,7 @@ jobs:
 
 
     - name: Publish moonli
+      if: startsWith(github.ref, 'refs/tags/')
       uses: SierraSoftworks/gh-releases@v1.0.4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -81,11 +101,13 @@ jobs:
         files: ${{ env.CORE }}.exe
 
 
-    - name: Prepare moonli-cl-repl
+    - name: Prepare moonli-repl
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/repl")' --eval '(asdf:make "moonli/repl")'
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+           --eval '(ql:quickload "moonli/repl")' \
+           --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+           --eval '(asdf:make "moonli/repl")'
         mv moonli.repl.exe ${{ env.REPL_CORE }}.exe
-
 
     - name: Upload moonli-cl-repl
       uses: actions/upload-artifact@v4
@@ -93,8 +115,8 @@ jobs:
         name: ${{ env.REPL_CORE }}.exe
         path: ${{ env.REPL_CORE }}.exe
 
-
     - name: Publish moonli-cl-repl
+      if: startsWith(github.ref, 'refs/tags/')
       uses: SierraSoftworks/gh-releases@v1.0.4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -106,12 +128,18 @@ jobs:
       run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
 
     - name: Prepare moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
       run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' --eval '(ql:quickload "moonli/ciel")' --eval '(asdf:make "moonli/ciel")'
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+           --eval '(ql:quickload "moonli/ciel")' \
+           --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+           --eval '(asdf:make "moonli/ciel")'
         mv moonli.ciel.exe ${{ env.CIEL_CORE }}.exe
 
-
     - name: Upload moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.CIEL_CORE }}.exe
@@ -119,6 +147,8 @@ jobs:
 
 
     - name: Publish moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
       uses: SierraSoftworks/gh-releases@v1.0.4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
