@@ -16,7 +16,7 @@ ___  ___                      _  _  ______  _____ ______  _
 (defvar *logo-color* "#ef2929")
 
 (defvar *copy* "Moonli (C) 2025 Shubhamkar Ayare (https://github.com/moonli-lang/moonli)")
-(setf *maintain* (format nil "Isocline (C) 2021 Daan Leijen (https://github.com/daanx/isocline)"))
+(defvar *maintain* (format nil "Isocline (C) 2021 Daan Leijen (https://github.com/daanx/isocline)"))
 
 (defvar *versions*
   (format nil "moonli-repl ~a on ~?~a ~a"
@@ -33,14 +33,16 @@ ___  ___                      _  _  ______  _____ ______  _
           (lisp-implementation-version)))
 
 (defun main (&optional (argv (opts:argv) argvp))
-  (let ((*debugger-enabled-p* nil)
-        (*print-case* :downcase)
+  (let ((*debugger-hook* 'ic-repl:debugger)
         (ic-repl:*read-function*
           (lambda (stream)
             (moonli:read-moonli-from-string
              (with-output-to-string (out)
                (loop :while (listen stream)
-                     :do (write-char (read-char stream) out)))))))
+                     :do (write-char (read-char stream) out))))))
+        (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*)
+        (*print-pretty* t)
+        (*print-length* 10))
     (multiple-value-bind (options free-args)
         (handler-case
             (if argvp (opts:get-opts argv) (opts:get-opts))
@@ -54,8 +56,8 @@ ___  ___                      _  _  ______  _____ ______  _
       (alexandria:doplist (key arg options)
         (process-option key arg))
       (setf *site-init-path*
-              (uiop:native-namestring
-               (merge-pathnames ".moonlirc" (user-homedir-pathname))))
+            (uiop:native-namestring
+             (merge-pathnames ".moonlirc" (user-homedir-pathname))))
       (when (and *site-init* (probe-file *site-init-path*))
         (moonli:load-moonli-file *site-init-path* :transpile nil))
       (alexandria:doplist (key arg free-args)
@@ -67,12 +69,11 @@ ___  ___                      _  _  ______  _____ ______  _
     (unless *silent*
       (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))
       (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*))
-    (let* ((*print-pretty* t)
-           (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*))
-      (asdf:initialize-source-registry (list :source-registry
-                                             (list :directory (uiop:getcwd))
-                                             :inherit-configuration))
-      (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
-      (ic:set-prompt-marker "> " "")
-      (ic:enable-multiline-indent nil)
-      (ic-repl:repl))))
+    (asdf:initialize-source-registry (list :source-registry
+                                           (list :directory (uiop:getcwd))
+                                           :inherit-configuration))
+    (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
+    (ic:set-default-highlighter (cffi:callback highlighter) (cffi:null-pointer))
+    (ic:set-prompt-marker "> " "")
+    (ic:enable-multiline-indent nil)
+    (ic-repl:repl)))
