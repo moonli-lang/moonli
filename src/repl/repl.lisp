@@ -33,16 +33,17 @@ ___  ___                      _  _  ______  _____ ______  _
           (lisp-implementation-version)))
 
 (defun main (&optional (argv (opts:argv) argvp))
-  (let ((*debugger-hook* 'ic-repl:debugger)
-        (ic-repl:*read-function*
-          (lambda (stream)
-            (moonli:read-moonli-from-string
-             (with-output-to-string (out)
-               (loop :while (listen stream)
-                     :do (write-char (read-char stream) out))))))
-        (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*)
-        (*print-pretty* t)
-        (*print-length* 10))
+  (let* ((ic-repl:*read-function*
+           (lambda (stream)
+             (moonli:read-moonli-from-string
+              (with-output-to-string (out)
+                (loop :while (listen stream)
+                      :do (write-char (read-char stream) out))))))
+         (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*)
+         (*print-pretty* t)
+         (*print-length* 10)
+         (*debugger-hook* 'ic-repl:debugger)
+         (ic-repl:*output-marker* "#=>"))
     (multiple-value-bind (options free-args)
         (handler-case
             (if argvp (opts:get-opts argv) (opts:get-opts))

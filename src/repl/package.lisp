@@ -11,5 +11,6 @@
   (:local-nicknames (:ic :isocline)
                     (:ic-repl :isocline-repl))
   (:import-from #:isocline-repl
-                #:completer)
+                #:completer
+                #:highlighter)
   (:export #:main))
