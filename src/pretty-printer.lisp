@@ -1,6 +1,6 @@
 (in-package :moonli)
 
-(defvar *moonli-pprint-dispatch* (copy-pprint-dispatch nil))
+(defvar *moonli-pprint-dispatch* (copy-pprint-dispatch))
 
 (defun register-moonli-pprint-dispatch (type-specifier)
   (set-pprint-dispatch type-specifier
