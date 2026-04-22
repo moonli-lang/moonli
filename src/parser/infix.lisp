@@ -98,15 +98,23 @@
   (:function process-nary-infix-expression))
 
 (esrap:defrule optional-expt
-    (or expt optionally-typed-expression))
+    (or expt optional-unary-minus))
 
 (esrap:defrule expt
-    (and optionally-typed-expression
+    (and optional-unary-minus
          +whitespace/all
          #\^
          +whitespace/all
-         optionally-typed-expression)
+         optional-unary-minus)
   (:function process-binary-infix-expression))
+
+(esrap:defrule optional-unary-minus
+    (or unary-minus optionally-typed-expression))
+
+(esrap:defrule unary-minus
+    (and "-" +whitespace/internal optionally-typed-expression)
+  (:function (lambda (expr)
+               `(,(find-symbol "-") ,(third expr)))))
 
 (esrap:defrule optionally-typed-expression
     (or typed-expression
@@ -132,6 +140,8 @@
                  (esrap:parse 'infix-expression "2 + if zerop(x): -1 else: 1 end")))
   (5am:is (equal `(+ (* 2 3) 4)
                  (esrap:parse 'infix-expression "2 * 3 + 4")))
+  (5am:is (equal `(- 3)
+                 (esrap:parse 'infix-expression "- 3")))
   (5am:is (equal `(+ 2 (* 3 4))
                  (esrap:parse 'infix-expression "2 + 3 * 4")))
   (5am:is (equal `(setf (aref a 0 1)
@@ -148,7 +158,11 @@
   (5am:is (equal `(- (+ (* 2 3)
                         (* (/ 4 5) 3))
                      (expt 2 10))
-                 (esrap:parse 'infix-expression "2 * 3 + 4 / 5 * 3 - 2 ^ 10"))))
+                 (esrap:parse 'infix-expression "2 * 3 + 4 / 5 * 3 - 2 ^ 10")))
+  (5am:is (equal `(- (+ (* (- 2) 3)
+                        (* (/ 4 5) 3))
+                     (expt 2 10))
+                 (esrap:parse 'infix-expression "- 2 * 3 + 4 / 5 * 3 - 2 ^ 10"))))
 
 (5am:def-test typed-expression ()
   (5am:is (equal `(the number 2)
