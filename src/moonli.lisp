@@ -104,8 +104,27 @@ prior to transpilation errors.
           (transpile-moonli-file moonli-file)
         (load lisp-file)
         (load debug-file))
-      (eval (read-moonli-from-string
-             (alexandria:read-file-into-string moonli-file)))))
+      (let ((file-contents (alexandria:read-file-into-string moonli-file))
+            (file-position 0))
+        (loop :while (and file-position
+                          (< file-position (length file-contents)))
+              :do (multiple-value-bind (expr pos success)
+                      (esrap:parse `(or #\;
+                                        whitespace
+                                        moonli-expression)
+                                   file-contents
+                                   :junk-allowed t
+                                   :start file-position)
+                    (if success
+                        (progn
+                          (unless (typep expr 'comment-cst)
+                            (eval expr))
+                          (setf file-position pos))
+                        (esrap:parse `(or #\;
+                                          whitespace
+                                          moonli-expression)
+                                     file-contents
+                                     :start file-position)))))))
 
 (defun may-be-eval-form (form)
   (let ((expanded (swank/backend:macroexpand-all form)))
