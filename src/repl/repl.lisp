@@ -61,8 +61,15 @@ ___  ___                      _  _  ______  _____ ______  _
              (merge-pathnames ".moonlirc" (user-homedir-pathname))))
       (when (and *site-init* (probe-file *site-init-path*))
         (moonli:load-moonli-file *site-init-path* :transpile nil))
-      (alexandria:doplist (key arg free-args)
-        (process-option key arg))
+      (handler-bind ((error
+                       (lambda (c)
+                         (format *error-output* "~A" c)
+                         (uiop:print-backtrace
+                          :condition c :stream *error-output*)
+                         (uiop:quit 1))))
+          (dolist (file-name free-args)
+            (process-option :load file-name)
+            (uiop:quit 0)))
       (unless (boundp 'ic-repl:*history-file*)
         (setf ic-repl:*history-file*
               (uiop:native-namestring
