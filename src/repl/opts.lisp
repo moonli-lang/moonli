@@ -48,7 +48,9 @@
   (cons 500
         (lambda ()
           (opts:describe
-           :prefix "A full-featured Moonli REPL")
+           :prefix "A full-featured Moonli REPL"
+           :usage-of "moonli"
+           :args "script-1 script-2 ...")
           (uiop:quit 0))))
 
 (defmethod process-option ((option (eql :enable-debugger)) arg)
