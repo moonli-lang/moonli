@@ -12,7 +12,17 @@
 
 (register-moonli-pprint-dispatch 'cons)
 (defmethod moonli-pprint-object (stream (o cons))
-  (format stream "(~{~a~^, ~})" o))
+  (write-char #\( stream)
+  (format stream "~a" (car o))
+  (loop :for (car . cdr) :on o
+        :for i :from 0
+        :do (etypecase cdr
+              (null (write-char #\) stream))
+              (atom (if (zerop i)
+                        (format stream " . ~a)" cdr)
+                        (format stream ", ~a . ~a)" car cdr)))
+              (cons (unless (zerop i)
+                      (format stream ", ~a" car))))))
 
 ;; TODO: Respect print-length, etc
 
