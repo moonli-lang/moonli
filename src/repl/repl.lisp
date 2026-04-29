@@ -38,11 +38,14 @@
                 (loop :while (listen stream)
                       :do (write-char (read-char stream) out))))))
          (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*)
+         (*print-case* :downcase)
          (*print-pretty* t)
          (*print-length* 10)
          (*debugger-hook* 'ic-repl:debugger)
          (ic-repl:*output-marker* "#=>"))
+
     (multiple-value-bind (options free-args)
+
         (handler-case
             (if argvp (opts:get-opts argv) (opts:get-opts))
           (error (e)
@@ -52,29 +55,50 @@
             (uiop:print-backtrace :stream uiop:*stderr* :condition e)
             (format t "try `moonli-repl --help`.~&")
             (uiop:quit 1)))
-      (alexandria:doplist (key arg options)
-        (process-option key arg))
-      (setf *site-init-path*
-            (uiop:native-namestring
-             (merge-pathnames ".moonlirc" (user-homedir-pathname))))
-      (when (and *site-init* (probe-file *site-init-path*))
-        (moonli:load-moonli-file *site-init-path* :transpile nil))
+
       (handler-bind ((error
                        (lambda (c)
                          (format *error-output* "~A" c)
                          (uiop:print-backtrace
                           :condition c :stream *error-output*)
-                         (uiop:quit 1))))
-          (dolist (file-name free-args)
-            (process-option :load file-name)
-            (uiop:quit 0)))
-      (unless (boundp 'ic-repl:*history-file*)
-        (setf ic-repl:*history-file*
-              (uiop:native-namestring
-               (merge-pathnames ".moonli-repl" (user-homedir-pathname))))))
+                         (when free-args (uiop:quit 1)))))
+
+        (let ((processors nil))
+          (alexandria:doplist (key arg options)
+            (push (process-option key arg) processors))
+          (setf processors (stable-sort processors #'> :key #'car))
+
+          ;; Process options with positive priorities
+          (dolist (processor processors)
+            (when (< 0 (car processor))
+              (funcall (cdr processor))))
+
+          (unless (boundp 'ic-repl:*history-file*)
+            (setf ic-repl:*history-file*
+                  (uiop:native-namestring
+                   (merge-pathnames ".moonli-repl" (user-homedir-pathname)))))
+
+          (setf *site-init-path*
+                (uiop:native-namestring
+                 (merge-pathnames ".moonlirc" (user-homedir-pathname))))
+          (when (and *site-init* (probe-file *site-init-path*))
+            (moonli:load-moonli-file *site-init-path* :transpile nil))
+
+          ;; Finally process options with non-positive priorities
+          (dolist (processor processors)
+            (when (>= 0 (car processor))
+              (funcall (cdr processor)))))
+
+        ;; Finally process scripts
+        (when free-args
+          (dolist (script-file free-args)
+            (funcall (cdr (process-option :load script-file))))
+          (uiop:quit 0))))
+
     (unless *silent*
       (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))
       (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*))
+
     (asdf:initialize-source-registry (list :source-registry
                                            (list :directory (uiop:getcwd))
                                            :inherit-configuration))

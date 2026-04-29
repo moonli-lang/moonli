@@ -45,27 +45,37 @@
 
 (defmethod process-option ((option (eql :help)) arg)
   (declare (ignore option arg))
-  (opts:describe
-   :prefix "A full-featured Moonli REPL")
-  (uiop:quit 0))
+  (cons 500
+        (lambda ()
+          (opts:describe
+           :prefix "A full-featured Moonli REPL")
+          (uiop:quit 0))))
 
 (defmethod process-option ((option (eql :enable-debugger)) arg)
   (declare (ignore option arg))
-  (setq *debugger-enabled-p* t))
+  (cons 90
+        (lambda ()
+          (setq *debugger-enabled-p* t))))
 
 (defvar *site-init* t)
 (defvar *site-init-path*)
 
 (defmethod process-option ((option (eql :no-init)) arg)
   (declare (ignore option arg))
-  (setf *site-init* nil))
+  (cons 95
+        (lambda ()
+          (setf *site-init* nil))))
 
 (defvar *silent* nil)
 
 (defmethod process-option ((option (eql :silent)) arg)
   (declare (ignore option arg))
-  (setf *silent* t))
+  (cons 99
+        (lambda ()
+          (setf *silent* t))))
 
 (defmethod process-option ((option (eql :history-file)) arg)
   (declare (ignore option))
-  (setf ic-repl:*history-file* (uiop:native-namestring arg)))
+  (cons 100
+        (lambda ()
+          (setf ic-repl:*history-file* (uiop:native-namestring arg)))))

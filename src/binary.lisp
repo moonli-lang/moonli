@@ -32,32 +32,42 @@
 
 (defmethod process-option ((option (eql :help)) arg)
   (declare (ignore option arg))
-  (opts:describe :prefix "A very basic Moonli REPL"
-                 :usage-of "moonli"
-                 :args "script-1 script-2 ...")
-  (uiop:quit 0))
+  (cons 100
+        (lambda ()
+          (opts:describe :prefix "A very basic Moonli REPL"
+                         :usage-of "moonli"
+                         :args "script-1 script-2 ...")
+          (uiop:quit 0))))
 
 (defmethod process-option ((option (eql :version)) arg)
   (declare (ignore option arg))
-  (format t "v~a~&" (asdf:component-version (asdf:find-system "moonli")))
-  (uiop:quit 0))
+  (cons 1000
+        (lambda ()
+          (format t "v~a~&" (asdf:component-version (asdf:find-system "moonli")))
+          (uiop:quit 0))))
 
 (defmethod process-option ((option (eql :eval)) arg)
   (declare (ignore option))
-  (eval (moonli:read-moonli-from-string arg)))
+  (cons 0
+        (lambda ()
+          (eval (moonli:read-moonli-from-string arg)))))
 
 (defmethod process-option ((option (eql :load)) arg)
   (declare (ignore option))
-  (cond ((member (pathname-type arg)
-                 '("lisp" "lsp")
-                 :test #'string-equal)
-         (load arg))
-        ((string-equal "moonli" (pathname-type arg))
-         (moonli:load-moonli-file arg :transpile nil))))
+  (cons 0
+        (lambda ()
+          (cond ((member (pathname-type arg)
+                         '("lisp" "lsp")
+                         :test #'string-equal)
+                 (load arg))
+                ((string-equal "moonli" (pathname-type arg))
+                 (moonli:load-moonli-file arg :transpile nil))))))
 
 (defmethod process-option ((option (eql :transpile)) arg)
   (declare (ignore option))
-  (moonli:transpile-moonli-file arg))
+  (cons 0
+        (lambda ()
+          (moonli:transpile-moonli-file arg))))
 
 (defun main (&optional (argv nil argvp))
   (let ((*package* (find-package :moonli-user))
@@ -72,16 +82,22 @@
             (uiop:print-backtrace :stream uiop:*stderr* :condition e)
             (format t "try `moonli --help`~&")
             (uiop:quit 1)))
-      (alexandria:doplist (key arg options)
-        (process-option key arg))
       (handler-bind ((error
                        (lambda (c)
                          (format *error-output* "~A" c)
                          (uiop:print-backtrace
                           :condition c :stream *error-output*)
-                         (uiop:quit 1))))
-        (dolist (file-name free-args)
-          (process-option :load file-name)
+                         (when free-args (uiop:quit 1)))))
+
+        (let ((processors nil))
+          (alexandria:doplist (key arg options)
+            (push (process-option key arg) processors))
+          (setf processors (stable-sort processors #'> :key #'car))
+          (mapcar #'funcall (mapcar #'cdr processors)))
+
+        (when free-args
+          (dolist (file-name free-args)
+            (funcall (cdr (process-option :load file-name))))
           (uiop:quit 0))))
     (loop :initially (write-string "* ")
                      (force-output)
