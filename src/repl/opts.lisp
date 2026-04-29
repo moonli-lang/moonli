@@ -57,7 +57,7 @@
 
 (defmethod process-option ((option (eql :version)) arg)
   (declare (ignore option arg))
-  (format t "moonli-repl v~a~&" *versions*)
+  (format t "v~a~&" (asdf:component-version (asdf:find-system "moonli")))
   (uiop:quit 0))
 
 (defvar *site-init* t)
