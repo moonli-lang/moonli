@@ -13,4 +13,6 @@
   (:import-from #:isocline-repl
                 #:completer
                 #:highlighter)
+  (:import-from #:moonli
+                #:process-option)
   (:export #:main))
