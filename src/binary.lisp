@@ -6,9 +6,14 @@
 (unix-opts:define-opts
 
   (:name :help
-   :description "Print this help text"
+   :description "Print this help and exit."
    :short #\h
    :long "help")
+
+  (:name :version
+   :description "Show the version info and exit."
+   :short #\v
+   :long "version")
 
   (:name :load-lisp
    :description "Load lisp file"
@@ -51,8 +56,7 @@
        :prefix "A basic moonli transpiler over SBCL")
       (uiop:quit 0))
     (when-option (options :version)
-      (format t "moonli v~a~&"
-              (slot-value (asdf:find-system "moonli") 'asdf::version))
+      (format t "v~a~&" (asdf:component-version (asdf:find-system "moonli")))
       (uiop:quit 0)))
   (let ((*package* (find-package :moonli-user)))
     (loop :initially (write-string "* ")
