@@ -1,34 +1,40 @@
 (in-package :moonli)
 
 (defun read-moonli-from-stream (stream read-until-eof)
-  (loop :with initial-input := (make-array 0
-                                           :element-type 'character
-                                           :fill-pointer t)
+  (loop :with initial-input := (make-array 0 :element-type 'character
+                                             :fill-pointer t)
         :with results := nil
-        :until
-        (handler-case
-            (progn
-              (setf initial-input
-                    (or (with-output-to-string (s initial-input)
-                          (if read-until-eof
-                              (loop :while (listen stream)
-                                    :do (write-char (read-char stream) s))
-                              (loop :for line := (read-line stream nil :end-of-file)
-                                    :if (and (stringp line)
-                                             (zerop (length line)))
-                                      :do (return)
-                                    :else
-                                      :do (if (eq :end-of-file line)
-                                              (uiop:quit)
-                                              (write-line line s)))))
-                        initial-input))
-              (setf results
-                    (nconc results
-                           (rest (read-moonli-from-string initial-input)))))
-          ((or moonli-parse-error
-               esrap:esrap-parse-error)
-              ()
-            nil))
+        :with empty-line := nil
+        :while (and (null results)
+                    (null empty-line))
+        :do (handler-case
+                (handler-bind (((or moonli-parse-error
+                                    esrap:esrap-parse-error)
+                                 (lambda (c)
+                                   (when empty-line
+                                     (format *error-output* "~A~%" c)
+                                     (uiop:print-backtrace :condition c)))))
+                  (setf initial-input
+                        (or (with-output-to-string (s initial-input)
+                              (if read-until-eof
+                                  (loop :while (listen stream)
+                                        :do (write-char (read-char stream) s))
+                                  (loop :for line := (read-line stream nil :end-of-file)
+                                        :if (and (stringp line)
+                                                 (zerop (length line)))
+                                          :do (setf empty-line t)
+                                              (return)
+                                        :else
+                                          :do (if (eq :end-of-file line)
+                                                  (uiop:quit)
+                                                  (write-line line s)))))
+                            initial-input))
+                  (setf results
+                        (nconc results
+                               (rest (read-moonli-from-string initial-input)))))
+              ((or moonli-parse-error
+                   esrap:esrap-parse-error)
+                  nil))
         :finally (return `(progn ,@results))))
 
 (defun read-moonli-from-string (string &optional read-partial)
