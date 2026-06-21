@@ -65,6 +65,7 @@
 (defsystem "moonli/repl"
   :depends-on ("uiop"
                "moonli"
+               "binding-arrows"
                "isocline-repl"
                "for"
                "com.inuoe.jzon"
@@ -78,7 +79,8 @@
   :serial t
   :components ((:file "repl/package")
                (:module "extra-macros"
-                :components ((:file "for")))
+                :components ((:file "for")
+                             (:file "arrows")))
                (:file "repl/opts")
                (:file "repl/repl")))
 
