@@ -43,6 +43,11 @@
   (funcall (car (gethash (first expression) *moonli-short-macro-functions*))
            (rest expression)))
 
+(defvar *moonli-infix-macro-functions* (make-hash-table))
+(defun expand-moonli-infix-macro (expression)
+  (funcall (car (gethash (first expression) *moonli-infix-macro-functions*))
+           (rest expression)))
+
 
 (esrap:defrule expr:symbol
     (or (and #\: simple-symbol)
@@ -101,6 +106,7 @@
                    :test #'string-equal)
            (gethash symbol *moonli-macro-functions*)
            (gethash symbol *moonli-short-macro-functions*)
+           (gethash symbol *moonli-infix-macro-functions*)
            (ignore-errors
             (parse-number:parse-number (symbol-name symbol))))))
 

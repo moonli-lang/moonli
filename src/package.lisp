@@ -35,6 +35,7 @@
            #:transpile-moonli-file
            #:define-moonli-macro
            #:define-moonli-short-macro
+           #:define-moonli-infix-macro
 
            #:moonli-pprint-object
            #:moonli-hash-table-pprint-indent*

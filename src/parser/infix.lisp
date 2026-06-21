@@ -7,13 +7,15 @@
 ;;; same names. Thus, we will not make infix operators depend on symbols.
 ;;; They will only directly relate to strings.
 
-(defun infix-operator-to-symbol (op-string)
-  (alexandria:switch (op-string :test #'string=)
-    ("=" (find-symbol "SETF"))
-    ("==" (find-symbol "="))
-    ("!=" (find-symbol "/="))
-    ("^" (find-symbol "EXPT"))
-    (t (find-symbol (string-upcase (string op-string))))))
+(defun infix-operator-to-symbol (op)
+  (if (and (symbolp op) (symbol-package op))
+      op
+      (alexandria:switch (op :test #'string=)
+        ("=" (find-symbol "SETF"))
+        ("==" (find-symbol "="))
+        ("!=" (find-symbol "/="))
+        ("^" (find-symbol "EXPT"))
+        (t (find-symbol (string-upcase (string op)))))))
 
 (defun process-binary-infix-expression (expr)
   `(,(infix-operator-to-symbol (third expr))
@@ -37,6 +39,7 @@
     (or assignment
         disjunction)
   (:error-report nil))
+
 
 (esrap:defrule assignment
     (and chain
@@ -98,15 +101,38 @@
   (:function process-nary-infix-expression))
 
 (esrap:defrule optional-expt
-    (or expt optional-unary-minus))
+    (or expt infix-non-assignment))
 
 (esrap:defrule expt
-    (and optional-unary-minus
+    (and infix-non-assignment
          +whitespace/all
          #\^
          +whitespace/all
-         optional-unary-minus)
+         infix-non-assignment)
   (:function process-binary-infix-expression))
+
+
+
+(defvar *moonli-infix-macros* (make-hash-table)
+  "User defined infix macros.")
+
+(defmacro define-moonli-infix-macro (op)
+  (check-type op symbol)
+  `(setf (gethash ',op *moonli-infix-macros*) t))
+
+(defun infix-macro-symbol-p (op) (gethash op *moonli-infix-macros*))
+
+(esrap:defrule infix-macro-symbol
+    (infix-macro-symbol-p expr:symbol))
+
+(esrap:defrule infix-non-assignment
+    (and optional-unary-minus
+         (* (and +whitespace/all
+                 infix-macro-symbol
+                 +whitespace/all
+                 optional-unary-minus)))
+  (:function process-nary-infix-expression))
+
 
 (esrap:defrule optional-unary-minus
     (or unary-minus optionally-typed-expression))
@@ -115,6 +141,7 @@
     (and "-" +whitespace/internal optionally-typed-expression)
   (:function (lambda (expr)
                `(,(find-symbol "-") ,(third expr)))))
+
 
 (esrap:defrule optionally-typed-expression
     (or typed-expression
@@ -130,7 +157,7 @@
          atomic-expression)
   (:function (lambda (expr)
                `(the ,(fifth expr)
-                     ,(first expr)))))
+                  ,(first expr)))))
 
 (5am:def-test infix-expression ()
   (5am:is (equal `(+ 2 (cond ((zerop x)
