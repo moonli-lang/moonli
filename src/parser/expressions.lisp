@@ -11,6 +11,7 @@
         good-symbol
         number
         expr:vector
+        expr:cons
         expr:list
         expr:hash-table
         expr:hash-set))

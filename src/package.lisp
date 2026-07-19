@@ -2,6 +2,7 @@
   (:use)
   (:export #:symbol
            #:character
+           #:cons
            #:list
            #:vector
            #:function-call

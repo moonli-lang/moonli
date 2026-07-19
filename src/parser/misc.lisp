@@ -38,6 +38,33 @@
         ","
         (error 'moonli-parse-error :expectation "," :position (1- start)))))
 
+(esrap:defrule expr:cons
+    (and #\(
+         *whitespace
+         moonli-expression
+         +whitespace
+         #\.
+         +whitespace
+         moonli-expression
+         *whitespace
+         #\))
+  (:function (lambda (expr)
+               `(cons ,(third expr) ,(seventh expr)))))
+
+(5am:def-test expr:cons ()
+  (5am:is (equal '(cons a b)
+                 (esrap:parse 'moonli-expression "(a . b)")))
+  (5am:is (equal '(cons a b)
+                 (esrap:parse 'moonli-expression "(a . b )")))
+  (5am:is (equal '(cons a b)
+                 (esrap:parse 'moonli-expression "( a . b )")))
+  (5am:is (equal '(cons a (identity))
+                 (esrap:parse 'moonli-expression "(a . identity())")))
+  (5am:is (equal '(cons (identity) 42)
+                 (esrap:parse 'moonli-expression "(identity() . 42)")))
+  (5am:is (equal '(cons (identity) (list 1 2 3))
+                 (esrap:parse 'moonli-expression "(identity() . (1, 2, 3))"))))
+
 (esrap:defrule expr:list
     (or (and #\( *whitespace #\))
         (and #\(
