@@ -81,20 +81,28 @@
                          (return-from macro-check symbol)))))
                  *moonli-short-macro-functions*)
         symbol)))
-  (:function (lambda (expr)
-               (optima:match expr
-                 ((list package-name ":" symbol-name)
-                  (let ((package (find-package package-name)))
-                    (if package
-                        (intern symbol-name package)
-                        (error (format nil "Package with name ~A does not exist while reading ~A:~A"
-                                       package-name
-                                       (string-invert-case package-name)
-                                       (string-invert-case symbol-name))))))
-                 ((list ":" symbol-name)
-                  (intern symbol-name :keyword))
-                 ((list symbol-name)
-                  (intern symbol-name)))))
+  (:lambda (expr esrap:&bounds start end)
+    (let ((symbol
+            (optima:match expr
+              ((list package-name ":" symbol-name)
+               (let ((package (find-package package-name)))
+                 (if package
+                     (intern symbol-name package)
+                     (error (format nil "Package with name ~A does not exist while reading ~A:~A"
+                                    package-name
+                                    (string-invert-case package-name)
+                                    (string-invert-case symbol-name))))))
+              ((list ":" symbol-name)
+               (intern symbol-name :keyword))
+              ((list symbol-name)
+               (intern symbol-name)))))
+      (cond ((constantp symbol)
+             (mark-syntax 'constant start end))
+            ((find-class symbol nil)
+             (mark-syntax 'type start end))
+            ((not (good-symbol-p symbol))
+             (mark-syntax 'keyword start end)))
+      symbol))
   (:error-report :context))
 
 

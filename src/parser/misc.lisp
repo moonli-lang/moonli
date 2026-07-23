@@ -17,15 +17,16 @@
          (* (or (and #\\ #\")
                 (not #\")))
          #\")
-  (:function (lambda (expr)
-               (with-output-to-string (s)
-                 (dolist (elt (second expr))
-                   (etypecase elt
-                     (character (write-char elt s))
-                     (cons
-                      (assert (and (null (cddr elt))
-                                   (string= "\\" (first elt))))
-                      (write-string (second elt) s))))))))
+  (:lambda (expr esrap:&bounds start end)
+    (mark-syntax 'string start end)
+    (with-output-to-string (s)
+      (dolist (elt (second expr))
+        (etypecase elt
+          (character (write-char elt s))
+          (cons
+           (assert (and (null (cddr elt))
+                        (string= "\\" (first elt))))
+           (write-string (second elt) s)))))))
 
 (esrap:defrule string-designator
     (or string expr:symbol))

@@ -110,10 +110,11 @@
          (* (not (or #\newline #\return)))
          (or #\newline #\return))
   (:error-report nil)
-  (:function (lambda (expr)
-               (when expr
-                 (make-comment (length (first expr))
-                               (esrap:text (second expr)))))))
+  (:lambda (expr esrap:&bounds start end)
+    (when expr
+      (mark-syntax 'comment start end)
+      (make-comment (length (first expr))
+                    (esrap:text (second expr))))))
 
 (esrap:defrule whitespace/internal
     (or #\Space #\Tab)

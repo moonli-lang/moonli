@@ -3,7 +3,9 @@
 (esrap:defrule number
     (or float decimal)
   (:text t)
-  (:function parse-number:parse-number))
+  (:lambda (expr esrap:&bounds start end)
+    (mark-syntax 'number start end)
+    (parse-number:parse-number expr)))
 
 (esrap:defrule float
     (and decimal
