@@ -13,8 +13,7 @@
   (:local-nicknames (:ic :isocline)
                     (:ic-repl :isocline-repl))
   (:import-from #:isocline-repl
-                #:completer
-                #:highlighter)
+                #:completer)
   (:import-from #:moonli
                 #:process-option)
   (:export #:main))

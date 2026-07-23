@@ -26,7 +26,11 @@
 
 (defpackage :moonli
   (:use :cl :let-plus)
-  (:export #:moonli
+  (:export #:with-syntax
+           #:mark-syntax
+           #:syntax-positions
+
+           #:moonli
            #:moonli-expression
            #:read-moonli-from-stream
            #:read-moonli-from-string

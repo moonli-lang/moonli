@@ -30,6 +30,24 @@
           (lisp-implementation-type)
           (lisp-implementation-version)))
 
+(cffi:defcallback highlighter :void
+    ((henv (:pointer (:struct ic:highlight-env)))
+     (input :string)
+     (arg :pointer))
+  (declare (optimize (speed 1) safety debug)
+           (ignore arg))
+  (moonli:with-syntax
+    (moonli:read-moonli-from-string input t)
+    (loop :for (kind . hl-class) :in '((keyword . "keyword")
+                                       (control . "control")
+                                       (string . "string")
+                                       (comment . "comment")
+                                       (number . "number")
+                                       (type . "type")
+                                       (constant . "constant"))
+          :do (loop :for (start . end) :in (moonli:syntax-positions kind)
+                    :do (ic:highlight henv start (- end start) hl-class)))))
+
 (defun main (&optional (argv (opts:argv) argvp))
   (let* ((ic-repl:*read-function*
            (lambda (stream)

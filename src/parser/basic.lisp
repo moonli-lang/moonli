@@ -7,6 +7,36 @@
 
 (defvar *transpilation-definition-source-form-table*)
 
+(defvar *syntax-positions*)
+(declaim (type syntax-positions *syntax-positions*))
+(defstruct (syntax-positions (:conc-name syntax-))
+  (keywords)
+  (controls)
+  (strings)
+  (comments)
+  (numbers)
+  (types)
+  (constants))
+
+(defmacro with-syntax (&body body)
+  `(let ((*syntax-positions* (make-syntax-positions)))
+     ,@body))
+
+(defun mark-syntax (kind start end)
+  (when (boundp '*syntax-positions*)
+    (let* ((retrieval-function (let ((*package* (find-package :moonli)))
+                                 (alexandria:symbolicate 'syntax- kind 's)))
+           (setter-function (fdefinition `(setf ,retrieval-function))))
+      (funcall setter-function
+               (cons (cons start end)
+                     (funcall retrieval-function *syntax-positions*))
+               *syntax-positions*))))
+
+(defun syntax-positions (kind)
+  (let* ((retrieval-function (let ((*package* (find-package :moonli)))
+                                 (alexandria:symbolicate 'syntax- kind 's))))
+    (funcall retrieval-function *syntax-positions*)))
+
 (defun position-to-line-column (text position)
   (let ((line (count #\newline text :end position))
         (col  (- position
