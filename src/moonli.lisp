@@ -124,7 +124,7 @@ prior to transpilation errors.
                                    :start file-position)
                     (if success
                         (progn
-                          (unless (typep expr 'comment-cst)
+                          (unless (typep expr 'comment)
                             (eval expr))
                           (setf file-position pos))
                         (esrap:parse `(or #\;
