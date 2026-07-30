@@ -25,7 +25,15 @@
    :description "Transpile moonli file to lisp file"
    :short #\t
    :long "transpile"
-   :arg-parser #'identity))
+   :arg-parser #'identity)
+
+  (:name :funcall
+   :description "Call a function with given arguments. For example, -f uiop:strcat hello world"
+   :short #\f
+   :long "funcall"
+   :arg-parser (lambda (x)
+                 (let ((*read-eval* nil))
+                   (read-from-string x)))))
 
 
 (defgeneric process-option (option argument))
@@ -69,6 +77,11 @@
         (lambda ()
           (moonli:transpile-moonli-file arg))))
 
+(defmethod process-option ((option (eql :funcall)) arg)
+  (declare (ignore option))
+  (cons 0
+        (lambda () arg)))
+
 (defun main (&optional (argv nil argvp))
   (let ((*package* (find-package :moonli-user))
         (*print-case* :downcase))
@@ -96,9 +109,20 @@
           (mapcar #'funcall (mapcar #'cdr processors)))
 
         (when free-args
-          (dolist (file-name free-args)
-            (funcall (cdr (process-option :load file-name))))
+          ;; If it was a funcall, pass rest of the arguments to it.
+          (cond ((getf options :funcall)
+                 (write (eval `(,(getf options :funcall)
+                                ,@(mapcar (lambda (arg)
+                                            (handler-case (esrap:parse 'number arg)
+                                              (esrap:esrap-parse-error () arg)))
+                                          free-args))))
+                 (terpri))
+                (t
+                 ;; Otherwise process scripts
+                 (dolist (file-name free-args)
+                   (funcall (cdr (process-option :load file-name))))))
           (uiop:quit 0))))
+
     (loop :initially (write-string "* ")
                      (force-output)
           :for result := (eval (read-moonli-from-stream *standard-input* nil))

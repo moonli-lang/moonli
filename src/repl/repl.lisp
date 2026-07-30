@@ -107,10 +107,19 @@
             (when (>= 0 (car processor))
               (funcall (cdr processor)))))
 
-        ;; Finally process scripts
         (when free-args
-          (dolist (script-file free-args)
-            (funcall (cdr (process-option :load script-file))))
+          ;; If it was a funcall, pass rest of the arguments to it.
+          (cond ((getf options :funcall)
+                 (write (eval `(,(getf options :funcall)
+                                ,@(mapcar (lambda (arg)
+                                            (handler-case (esrap:parse 'number arg)
+                                              (esrap:esrap-parse-error () arg)))
+                                          free-args))))
+                 (terpri))
+                (t
+                 ;; Otherwise process scripts
+                 (dolist (script-file free-args)
+                   (funcall (cdr (process-option :load script-file))))))
           (uiop:quit 0))))
 
     (unless *silent*
