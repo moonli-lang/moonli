@@ -76,7 +76,7 @@ jobs:
         cd "/home/runneradmin/$SBCL_DIR"
         make -C "src/runtime" -f binaries.mk sbcl.extras
         mv "src/runtime/sbcl.extras" "src/runtime/sbcl"
-        
+
     - name: Prepare moonli
       run: |
         cl --eval '(push "./" ql:*local-project-directories*)' \
@@ -127,30 +127,31 @@ jobs:
     - name: Install ultralisp
       run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
 
-    - name: Prepare moonli-ciel
-      if: startsWith(github.ref, 'refs/tags/')
-      continue-on-error: true
-      run: |
-        cl --eval '(push "./" ql:*local-project-directories*)' \
-           --eval '(ql:quickload "moonli/ciel")' \
-           --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
-           --eval '(asdf:make "moonli/ciel")'
-        mv moonli.ciel.exe ${{ env.CIEL_CORE }}.exe
+    # FIXME: https://github.com/ciel-lang/CIEL/issues/97
+    # - name: Prepare moonli-ciel
+    #   if: startsWith(github.ref, 'refs/tags/')
+    #   continue-on-error: true
+    #   run: |
+    #     cl --eval '(push "./" ql:*local-project-directories*)' \
+    #        --eval '(ql:quickload "moonli/ciel")' \
+    #        --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+    #        --eval '(asdf:make "moonli/ciel")'
+    #     mv moonli.ciel.exe ${{ env.CIEL_CORE }}.exe
 
-    - name: Upload moonli-ciel
-      if: startsWith(github.ref, 'refs/tags/')
-      continue-on-error: true
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.CIEL_CORE }}.exe
-        path: ${{ env.CIEL_CORE }}.exe
+    # - name: Upload moonli-ciel
+    #   if: startsWith(github.ref, 'refs/tags/')
+    #   continue-on-error: true
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ env.CIEL_CORE }}.exe
+    #     path: ${{ env.CIEL_CORE }}.exe
 
 
-    - name: Publish moonli-ciel
-      if: startsWith(github.ref, 'refs/tags/')
-      continue-on-error: true
-      uses: SierraSoftworks/gh-releases@v1.0.4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        overwrite: 'true'
-        files: ${{ env.CIEL_CORE }}.exe
+    # - name: Publish moonli-ciel
+    #   if: startsWith(github.ref, 'refs/tags/')
+    #   continue-on-error: true
+    #   uses: SierraSoftworks/gh-releases@v1.0.4
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     overwrite: 'true'
+    #     files: ${{ env.CIEL_CORE }}.exe
