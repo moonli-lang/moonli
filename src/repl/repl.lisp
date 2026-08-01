@@ -129,6 +129,8 @@
     (asdf:initialize-source-registry (list :source-registry
                                            (list :directory (uiop:getcwd))
                                            :inherit-configuration))
+    (setf ql-setup:*quicklisp-home*
+          (make-pathname :defaults "~/quicklisp/"))
     (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
     (ic:set-default-highlighter (cffi:callback highlighter) (cffi:null-pointer))
     (ic:set-prompt-marker "> " "")

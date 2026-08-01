@@ -63,7 +63,8 @@
   :components ((:file "asdf")))
 
 (defsystem "moonli/repl"
-  :depends-on ("uiop"
+  :depends-on ("ql-https"
+               "uiop"
                "moonli"
                "binding-arrows"
                "isocline-repl"
