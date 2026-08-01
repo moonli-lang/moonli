@@ -98,10 +98,10 @@ jobs:
         LIBISOCLINE="$HOME/quicklisp/local-projects/cl-isocline/isocline/build/release/libisocline.a"
 
         if [ "$OS" == "linux" ]; then
-            SBCL_DIR="/home/runner/sbcl-2.6.3+r00-$ARCH-$OS"
+            SBCL_DIR="/home/runner/sbcl-2.6.6+r00-$ARCH-$OS"
             export WHOLE_ARCHIVES="-Wl,--whole-archive $LIBCRYPTO $LIBSSL $LIBTLS $LIBISOCLINE"
         elif [ "$OS" == "darwin" ]; then
-            SBCL_DIR="/Users/runner/sbcl-2.6.3+r00-$ARCH-$OS"
+            SBCL_DIR="/Users/runner/sbcl-2.6.6+r00-$ARCH-$OS"
             # -force_load only works on one library at a time
             export WHOLE_ARCHIVES="-Wl,-force_load $LIBCRYPTO -Wl,-force_load $LIBSSL -Wl $LIBTLS -Wl,-force_load $LIBISOCLINE"
         fi

@@ -67,7 +67,7 @@ jobs:
 
     - name: Statically link against libisocline + libcrypto, libssl
       run: |
-        SBCL_DIR="sbcl-2.6.3+r00-x86-64-windows"
+        SBCL_DIR="sbcl-2.6.6+r00-x86-64-windows"
         SYS_LIBDIR="/mingw64/lib"
         LIBCRYPTO="${SYS_LIBDIR}/libcrypto.a ${SYS_LIBDIR}/libcrypt32.a"
         LIBSSL=${SYS_LIBDIR}/libssl.a
