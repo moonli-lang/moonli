@@ -30,7 +30,8 @@
 
 (define-moonli-short-macro in-package
   ((name expr:symbol))
-  (setf *package* (find-package name))
+  (when (find-package name)
+    (setf *package* (find-package name)))
   `(in-package ,name))
 
 (5am:def-test moonli/macro-tests::|common-lisp::in-package| ()
