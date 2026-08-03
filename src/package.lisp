@@ -29,6 +29,7 @@
   (:export #:with-syntax
            #:mark-syntax
            #:syntax-positions
+           #:*read-without-interning*
 
            #:moonli
            #:moonli-expression

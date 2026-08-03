@@ -1,5 +1,23 @@
 (in-package :moonli)
 
+(defvar *read-without-interning* nil
+  "When non-NIL, moonli reader creates a MOONLI-SYMBOL object out of symbols instead of
+interning them.")
+(defstruct moonli-symbol name package)
+
+(defun may-be-intern (name package)
+  (if *read-without-interning*
+      (make-moonli-symbol :name name :package package)
+      (intern name package)))
+
+(defmethod print-object ((o moonli-symbol) s)
+  (with-slots (name package) o
+    (if package
+        (if (eq *package* (find-package package))
+            (write-string name s)
+            (format s "~A::~A" package name))
+        (format s "#:~A" name))))
+
 (defun string-invert-case (string)
   (declare (optimize speed)
            (type string string))
@@ -58,9 +76,12 @@
       (let ((symbol (esrap:call-transform)))
         (maphash (lambda (key value)
                    (declare (ignore value))
-                   (when (and (string-equal key symbol)
-                              (not (eq (symbol-package key)
-                                       (symbol-package symbol))))
+                   (when (if (moonli-symbol-p symbol)
+                             (not (string= (package-name (symbol-package key))
+                                           (moonli-symbol-package symbol)))
+                             (and (string-equal key symbol)
+                                  (not (eq (symbol-package key)
+                                           (symbol-package symbol)))))
                      (restart-case
                          (signal 'wrong-symbol-package
                                  :actual symbol :expected key)
@@ -70,9 +91,12 @@
                  *moonli-macro-functions*)
         (maphash (lambda (key value)
                    (declare (ignore value))
-                   (when (and (string-equal key symbol)
-                              (not (eq (symbol-package key)
-                                       (symbol-package symbol))))
+                   (when (if (moonli-symbol-p symbol)
+                             (not (string= (package-name (symbol-package key))
+                                           (moonli-symbol-package symbol)))
+                             (and (string-equal key symbol)
+                                  (not (eq (symbol-package key)
+                                           (symbol-package symbol)))))
                      (restart-case
                          (signal 'wrong-symbol-package
                                  :actual symbol :expected key)
@@ -87,15 +111,15 @@
               ((list package-name ":" symbol-name)
                (let ((package (find-package package-name)))
                  (if package
-                     (intern symbol-name package)
+                     (may-be-intern symbol-name package-name)
                      (error (format nil "Package with name ~A does not exist while reading ~A:~A"
                                     package-name
                                     (string-invert-case package-name)
                                     (string-invert-case symbol-name))))))
               ((list ":" symbol-name)
-               (intern symbol-name :keyword))
+               (may-be-intern symbol-name "KEYWORD"))
               ((list symbol-name)
-               (intern symbol-name)))))
+               (may-be-intern symbol-name (package-name *package*))))))
       (cond ((constantp symbol)
              (mark-syntax 'constant start end))
             ((find-class symbol nil)
@@ -110,6 +134,13 @@
   ;; Excluding these symbols is necessary, otherwise parser
   ;; cannot tell whether this symbol appears as part of a macro
   ;; or a variable or something else the
+  (when (moonli-symbol-p symbol)
+    (with-slots (name package) symbol
+      (when (or (null package)
+                (null (find-package package))
+                (null (find-symbol name (find-package package))))
+        (return-from good-symbol-p t))
+      (setf symbol (find-symbol name (find-package package)))))
   (not (or (member symbol '(end elif else)
                    :test #'string-equal)
            (gethash symbol *moonli-macro-functions*)

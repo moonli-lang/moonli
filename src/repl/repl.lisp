@@ -37,7 +37,8 @@
   (declare (optimize (speed 1) safety debug)
            (ignore arg))
   (moonli:with-syntax
-    (moonli:read-moonli-from-string input t)
+    (let ((moonli:*read-without-interning* t))
+      (moonli:read-moonli-from-string input t))
     (loop :for (kind . hl-class) :in '((keyword . "keyword")
                                        (control . "control")
                                        (string . "string")
