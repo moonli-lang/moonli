@@ -229,9 +229,9 @@ end"))
            (write s)
            (terpri))
    :moonli "pprint-logical-block (s, nil, :per-line-prefix, \"  \"):
-              write(s)
-              terpri()
-            end"))
+  write(s)
+  terpri()
+end"))
 
 (define-moonli-macro print-unreadable-object
   ((ll arglist)
@@ -254,9 +254,9 @@ end"))
                            (fn-call arg1 arg2))
            (setf s (- s 2)))
    :moonli "unwind-protect
-                progn
-                  s = s + 2
-                  fn-call(arg1, arg2)
-                end
-              s = s - 2
-            end"))
+    progn
+      s = s + 2
+      fn-call(arg1, arg2)
+    end
+  s = s - 2
+end"))
