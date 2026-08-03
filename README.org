@@ -1,7 +1,7 @@
 #+title: Moonli Programming Language
 
 #+begin_quote
-Status: Experimental. Preferably, only use it in throwaway projects.
+Status: Beta. I've been using it in a project since the past year. I've been also trying to make it my daily driver.
 #+end_quote
 
 See [[https://moonli-lang.github.io][moonli-lang.github.io]] for documentation.
