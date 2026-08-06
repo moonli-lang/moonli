@@ -17,12 +17,15 @@
   (loop :for (car . cdr) :on o
         :for i :from 0
         :do (etypecase cdr
-              (null (write-char #\) stream))
-              (atom (if (zerop i)
-                        (format stream " . ~a)" cdr)
-                        (format stream ", ~a . ~a)" car cdr)))
-              (cons (unless (zerop i)
-                      (format stream ", ~a" car))))))
+              (list
+               (unless (zerop i)
+                 (format stream ", ~a" car))
+               (when (null cdr)
+                 (null (write-char #\) stream))))
+              (atom
+               (if (zerop i)
+                   (format stream " . ~a)" cdr)
+                   (format stream ", ~a . ~a)" car cdr))))))
 
 ;; TODO: Respect print-length, etc
 
