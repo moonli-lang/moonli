@@ -60,6 +60,7 @@
          (*print-case* :downcase)
          (*print-pretty* t)
          (*print-length* 10)
+         (ic-repl:*debugger-enabled-p* nil)
          (*debugger-hook* 'ic-repl:debugger)
          (ic-repl:*output-marker* "#=>"))
 
@@ -125,7 +126,11 @@
 
     (unless *silent*
       (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))
-      (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*))
+      (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*)
+      (ic:term-italic t)
+      (ic:println "  Press F1 to see available keybindings.")
+      (ic:term-italic nil)
+      (terpri))
 
     (asdf:initialize-source-registry (list :source-registry
                                            (list :directory (uiop:getcwd))
