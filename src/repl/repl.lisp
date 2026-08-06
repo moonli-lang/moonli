@@ -109,20 +109,20 @@
             (when (>= 0 (car processor))
               (funcall (cdr processor)))))
 
-        (when free-args
-          ;; If it was a funcall, pass rest of the arguments to it.
-          (cond ((getf options :funcall)
-                 (write (eval `(,(getf options :funcall)
-                                ,@(mapcar (lambda (arg)
-                                            (handler-case (esrap:parse 'number arg)
-                                              (esrap:esrap-parse-error () arg)))
-                                          free-args))))
-                 (terpri))
-                (t
-                 ;; Otherwise process scripts
-                 (dolist (script-file free-args)
-                   (funcall (cdr (process-option :load script-file))))))
-          (uiop:quit 0))))
+        ;; If it was a funcall, pass rest of the arguments to it.
+        (cond ((getf options :funcall)
+               (write (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
+                              ,@(mapcar (lambda (arg)
+                                          (handler-case (esrap:parse 'number arg)
+                                            (esrap:esrap-parse-error () arg)))
+                                        free-args))))
+               (terpri)
+               (uiop:quit 0))
+              (free-args
+               ;; Otherwise process scripts
+               (dolist (script-file free-args)
+                 (funcall (cdr (process-option :load script-file))))
+               (uiop:quit 0)))))
 
     (unless *silent*
       (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))

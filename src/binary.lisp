@@ -31,9 +31,7 @@
    :description "Call a function with given arguments. For example, -f uiop:strcat hello world"
    :short #\f
    :long "funcall"
-   :arg-parser (lambda (x)
-                 (let ((*read-eval* nil))
-                   (read-from-string x)))))
+   :arg-parser #'identity))
 
 
 (defgeneric process-option (option argument))
@@ -80,7 +78,13 @@
 (defmethod process-option ((option (eql :funcall)) arg)
   (declare (ignore option))
   (cons 0
-        (lambda () arg)))
+        (lambda ()
+          (let ((*read-eval* nil))
+            (let ((fn-form (second (read-moonli-from-string arg))))
+              (if (and (listp fn-form)
+                       (eq 'lm (first fn-form)))
+                  (macroexpand-1 fn-form)
+                  fn-form))))))
 
 (defun main (&optional (argv nil argvp))
   (let ((*package* (find-package :moonli-user))
@@ -108,20 +112,20 @@
           (setf processors (stable-sort processors #'> :key #'car))
           (mapcar #'funcall (mapcar #'cdr processors)))
 
-        (when free-args
-          ;; If it was a funcall, pass rest of the arguments to it.
-          (cond ((getf options :funcall)
-                 (write (eval `(,(getf options :funcall)
-                                ,@(mapcar (lambda (arg)
-                                            (handler-case (esrap:parse 'number arg)
-                                              (esrap:esrap-parse-error () arg)))
-                                          free-args))))
-                 (terpri))
-                (t
-                 ;; Otherwise process scripts
-                 (dolist (file-name free-args)
-                   (funcall (cdr (process-option :load file-name))))))
-          (uiop:quit 0))))
+        ;; If it was a funcall, pass rest of the arguments to it.
+        (cond ((getf options :funcall)
+               (write (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
+                              ,@(mapcar (lambda (arg)
+                                          (handler-case (esrap:parse 'number arg)
+                                            (esrap:esrap-parse-error () arg)))
+                                        free-args))))
+               (terpri)
+               (uiop:quit 0))
+              (free-args
+               ;; Otherwise process scripts
+               (dolist (file-name free-args)
+                 (funcall (cdr (process-option :load file-name))))
+               (uiop:quit 0)))))
 
     (loop :initially (write-string "* ")
                      (force-output)

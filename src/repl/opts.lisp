@@ -36,9 +36,7 @@
    :description "Call a function with given arguments. For example, -f uiop:strcat hello world"
    :short #\f
    :long "funcall"
-   :arg-parser (lambda (x)
-                 (let ((*read-eval* nil))
-                   (read-from-string x))))
+   :arg-parser #'identity)
   (:name :enable-debugger
    :description "Enable debugger: print error and drop into the debugger"
    :short #\d
