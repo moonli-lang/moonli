@@ -1,10 +1,11 @@
 (uiop:define-package :moonli-user
   (:mix-reexport #:cl #:let-plus #:for #:parse-float)
   (:import-from #:moonli #:lm #:ifelse)
-  (:import-from #:binding-arrows #:->)
+  (:import-from #:binding-arrows #:-> #:->>)
   (:export #:lm
            #:ifelse
-           #:->))
+           #:->
+           #:->>))
 
 (trivial-package-local-nicknames:add-package-local-nickname '#:json '#:com.inuoe.jzon '#:moonli-user)
 

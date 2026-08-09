@@ -17,3 +17,5 @@
    :moonli "- (3 + 4) -> add(3)")
   (:lisp (expt (binding-arrows:-> (- 4) (add 3)) 2)
    :moonli "- 4 -> add(3) ^ 2"))
+
+(define-moonli-infix-macro binding-arrows:->>)
