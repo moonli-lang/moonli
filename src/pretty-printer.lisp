@@ -12,20 +12,20 @@
 
 (register-moonli-pprint-dispatch 'cons)
 (defmethod moonli-pprint-object (stream (o cons))
-  (write-char #\( stream)
-  (format stream "~a" (car o))
-  (loop :for (car . cdr) :on o
-        :for i :from 0
-        :do (etypecase cdr
-              (list
-               (unless (zerop i)
-                 (format stream ", ~a" car))
-               (when (null cdr)
-                 (null (write-char #\) stream))))
-              (atom
-               (if (zerop i)
-                   (format stream " . ~a)" cdr)
-                   (format stream ", ~a . ~a)" car cdr))))))
+  (pprint-logical-block (stream o :prefix "(" :suffix ")")
+    (loop :for i :below (or *print-length* (expt 2 64))
+          :while o
+          :do (when (null o) (return))
+              (unless (consp o)
+                (write-string " . " stream)
+                (write o :stream stream)
+                (return))
+              (unless (zerop i)
+                (write-string ", " stream)
+                (pprint-newline :fill stream))
+              (write (car o) :stream stream)
+              (setf o (cdr o))
+          :finally (when o (write-string ", ..." stream)))))
 
 ;; TODO: Respect print-length, etc
 
