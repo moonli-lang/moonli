@@ -62,7 +62,8 @@
          (*print-length* 10)
          (ic-repl:*debugger-enabled-p* nil)
          (*debugger-hook* 'ic-repl:debugger)
-         (ic-repl:*output-marker* "#=>"))
+         (ic-repl:*output-marker* "#=> ")
+         (ic-repl:*values-separator* ", "))
 
     (multiple-value-bind (options free-args)
 
@@ -111,11 +112,20 @@
 
         ;; If it was a funcall, pass rest of the arguments to it.
         (cond ((getf options :funcall)
-               (write (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
-                              ,@(mapcar (lambda (arg)
-                                          (handler-case (esrap:parse 'number arg)
-                                            (esrap:esrap-parse-error () arg)))
-                                        free-args))))
+               (let ((results (multiple-value-list
+                               (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
+                                       ,@(mapcar (lambda (arg)
+                                                   (handler-case
+                                                       (esrap:parse 'moonsh-atomic-expression arg)
+                                                     (esrap:esrap-parse-error () arg)))
+                                                 free-args))))))
+                 (loop :for i :from 0
+                       :for result :in results
+                       :do (unless (zerop i)
+                             (write-string ic-repl:*values-separator*))
+                           (if (stringp result)
+                               (write-string result)
+                               (write result))))
                (terpri)
                (uiop:quit 0))
               (free-args

@@ -37,6 +37,10 @@
    :short #\f
    :long "funcall"
    :arg-parser #'identity)
+  (:name :values-separator
+   :description "String to use as the separator between multiple values"
+   :long "values-separator"
+   :arg-parser #'identity)
   (:name :enable-debugger
    :description "Enable debugger: print error and drop into the debugger"
    :short #\d

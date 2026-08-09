@@ -15,5 +15,6 @@
   (:import-from #:isocline-repl
                 #:completer)
   (:import-from #:moonli
-                #:process-option)
+                #:process-option
+                #:moonsh-atomic-expression)
   (:export #:main))

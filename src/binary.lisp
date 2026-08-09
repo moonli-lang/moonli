@@ -31,6 +31,11 @@
    :description "Call a function with given arguments. For example, -f uiop:strcat hello world"
    :short #\f
    :long "funcall"
+   :arg-parser #'identity)
+
+  (:name :values-separator
+   :description "String to use as the separator between multiple values"
+   :long "values-separator"
    :arg-parser #'identity))
 
 
@@ -86,6 +91,29 @@
                   (macroexpand-1 fn-form)
                   fn-form))))))
 
+(defvar *values-separator* (string #\newline))
+(defmethod process-option ((option (eql :values-separator)) arg)
+  (declare (ignore option))
+  (cons 90
+        (lambda ()
+          (setf *values-separator* arg)
+          (when (find-package :isocline-repl)
+            (setf (symbol-value (find-symbol "*VALUES-SEPARATOR*" :isocline-repl))
+                  arg)))))
+
+(esrap:defrule moonsh-atomic-expression
+    ;; This is identical to moonli's atomic-expression, but without any symbol,
+    ;; string or chain
+    (or bracketed-expression
+        quoted-expression
+        expr:character
+        number
+        expr:vector
+        expr:cons
+        expr:list
+        expr:hash-table
+        expr:hash-set))
+
 (defun main (&optional (argv nil argvp))
   (let ((*package* (find-package :moonli-user))
         (*print-case* :downcase))
@@ -114,11 +142,20 @@
 
         ;; If it was a funcall, pass rest of the arguments to it.
         (cond ((getf options :funcall)
-               (write (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
-                              ,@(mapcar (lambda (arg)
-                                          (handler-case (esrap:parse 'number arg)
-                                            (esrap:esrap-parse-error () arg)))
-                                        free-args))))
+               (let ((results (multiple-value-list
+                               (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
+                                       ,@(mapcar (lambda (arg)
+                                                   (handler-case
+                                                       (esrap:parse 'moonsh-atomic-expression arg)
+                                                     (esrap:esrap-parse-error () arg)))
+                                                 free-args))))))
+                 (loop :for i :from 0
+                       :for result :in results
+                       :do (unless (zerop i)
+                             (write-string *values-separator*))
+                           (if (stringp result)
+                               (write-string result)
+                               (write result))))
                (terpri)
                (uiop:quit 0))
               (free-args
