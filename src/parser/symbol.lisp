@@ -6,9 +6,15 @@ interning them.")
 (defstruct moonli-symbol name package)
 
 (defun may-be-intern (name package)
-  (if *read-without-interning*
-      (make-moonli-symbol :name name :package package)
-      (intern name package)))
+  (cond (*read-without-interning*
+         (make-moonli-symbol :name name :package package))
+        ((find-package package)
+         (intern name package))
+        (t
+         (error (format nil "Package with name ~A does not exist while reading ~A:~A"
+                        package
+                        (string-invert-case package)
+                        (string-invert-case name))))))
 
 (defmethod print-object ((o moonli-symbol) s)
   (with-slots (name package) o
@@ -109,13 +115,7 @@ interning them.")
     (let ((symbol
             (optima:match expr
               ((list package-name ":" symbol-name)
-               (let ((package (find-package package-name)))
-                 (if package
-                     (may-be-intern symbol-name package-name)
-                     (error (format nil "Package with name ~A does not exist while reading ~A:~A"
-                                    package-name
-                                    (string-invert-case package-name)
-                                    (string-invert-case symbol-name))))))
+               (may-be-intern symbol-name package-name))
               ((list ":" symbol-name)
                (may-be-intern symbol-name "KEYWORD"))
               ((list symbol-name)
