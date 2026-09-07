@@ -65,6 +65,10 @@
          (ic-repl:*output-marker* "#=> ")
          (ic-repl:*values-separator* ", "))
 
+    (asdf:initialize-source-registry (list :source-registry
+                                           (list :directory (uiop:getcwd))
+                                           :inherit-configuration))
+
     (multiple-value-bind (options free-args)
 
         (handler-case
@@ -89,6 +93,10 @@
             (push (process-option key arg) processors))
           (setf processors (stable-sort processors #'> :key #'car))
 
+          (setf moonli:*site-init-path*
+                (uiop:native-namestring
+                 (merge-pathnames ".moonlirc" (user-homedir-pathname))))
+
           ;; Process options with positive priorities
           (dolist (processor processors)
             (when (< 0 (car processor))
@@ -98,12 +106,6 @@
             (setf ic-repl:*history-file*
                   (uiop:native-namestring
                    (merge-pathnames ".moonli-repl" (user-homedir-pathname)))))
-
-          (setf *site-init-path*
-                (uiop:native-namestring
-                 (merge-pathnames ".moonlirc" (user-homedir-pathname))))
-          (when (and *site-init* (probe-file *site-init-path*))
-            (moonli:load-moonli-file *site-init-path* :transpile nil))
 
           ;; Finally process options with non-positive priorities
           (dolist (processor processors)
@@ -134,6 +136,8 @@
                  (funcall (cdr (process-option :load script-file))))
                (uiop:quit 0)))))
 
+    (ensure-site-init-loaded)
+
     (unless *silent*
       (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))
       (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*)
@@ -142,9 +146,6 @@
       (ic:term-italic nil)
       (terpri))
 
-    (asdf:initialize-source-registry (list :source-registry
-                                           (list :directory (uiop:getcwd))
-                                           :inherit-configuration))
     (setf ql-setup:*quicklisp-home*
           (make-pathname :defaults "~/quicklisp/"))
     (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))

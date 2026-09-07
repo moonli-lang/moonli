@@ -46,7 +46,8 @@
            #:moonli-pprint-object
            #:moonli-hash-table-pprint-indent*
 
-           #:main)
+           #:main
+           #:*site-init-path*)
   (:local-nicknames (:expr :moonli/expressions)))
 
 

@@ -17,5 +17,6 @@
                 #:completer)
   (:import-from #:moonli
                 #:process-option
-                #:moonsh-atomic-expression)
+                #:moonsh-atomic-expression
+                #:ensure-site-init-loaded)
   (:export #:main))

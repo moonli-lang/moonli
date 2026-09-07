@@ -68,15 +68,6 @@
         (lambda ()
           (setq *debugger-enabled-p* t))))
 
-(defvar *site-init* t)
-(defvar *site-init-path*)
-
-(defmethod process-option ((option (eql :no-init)) arg)
-  (declare (ignore option arg))
-  (cons 95
-        (lambda ()
-          (setf *site-init* nil))))
-
 (defvar *silent* nil)
 
 (defmethod process-option ((option (eql :silent)) arg)

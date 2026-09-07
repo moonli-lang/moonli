@@ -15,6 +15,11 @@
    :short #\v
    :long "version")
 
+  (:name :no-init
+   :description "Skip to load init file."
+   :short #\n
+   :long "no-init")
+
   (:name :load
    :description "Load a file"
    :short #\l
@@ -57,16 +62,36 @@
           (format t "v~a~&" (asdf:component-version (asdf:find-system "moonli")))
           (uiop:quit 0))))
 
+(defvar *site-init* t
+  "Whether to load *site-init-path* at startup for Moonli.")
+(defvar *site-init-path*)
+(defvar *site-init-loaded* nil
+  "When T, the *site-init-path* for moonli has already been loaded.")
+
+(defun ensure-site-init-loaded ()
+  (when *site-init*
+    (unless *site-init-loaded*
+      (moonli:load-moonli-file *site-init-path* :transpile nil)
+      (setf *site-init-loaded* t))))
+
+(defmethod process-option ((option (eql :no-init)) arg)
+  (declare (ignore option arg))
+  (cons 105
+        (lambda ()
+          (setf *site-init* nil))))
+
 (defmethod process-option ((option (eql :eval)) arg)
   (declare (ignore option))
   (cons 0
         (lambda ()
+          (ensure-site-init-loaded)
           (eval (moonli:read-moonli-from-string arg)))))
 
 (defmethod process-option ((option (eql :load)) arg)
   (declare (ignore option))
   (cons 0
         (lambda ()
+          (ensure-site-init-loaded)
           (cond ((member (pathname-type arg)
                          '("lisp" "lsp")
                          :test #'string-equal)
@@ -78,12 +103,14 @@
   (declare (ignore option))
   (cons 0
         (lambda ()
+          (ensure-site-init-loaded)
           (moonli:transpile-moonli-file arg))))
 
 (defmethod process-option ((option (eql :funcall)) arg)
   (declare (ignore option))
   (cons 0
         (lambda ()
+          (ensure-site-init-loaded)
           (let ((*read-eval* nil))
             (let ((fn-form (second (read-moonli-from-string arg))))
               (if (and (listp fn-form)
