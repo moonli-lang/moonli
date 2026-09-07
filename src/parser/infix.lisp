@@ -43,25 +43,25 @@
 
 (esrap:defrule assignment
     (and chain
-         +whitespace/all
+         +whitespace
          "="
-         +whitespace/all
+         +whitespace
          infix-expression)
   (:function process-binary-infix-expression))
 
 (esrap:defrule disjunction
     (and conjunction
-         (* (and +whitespace/all
+         (* (and +whitespace
                  "or"
-                 +whitespace/all
+                 +whitespace
                  conjunction)))
   (:function process-nary-infix-expression))
 
 (esrap:defrule conjunction
     (and optional-negation
-         (* (and +whitespace/all
+         (* (and +whitespace
                  "and"
-                 +whitespace/all
+                 +whitespace
                  optional-negation)))
   (:function process-nary-infix-expression))
 
@@ -75,9 +75,9 @@
 
 (esrap:defrule comparison
     (and math-expression
-         (* (and +whitespace/all
+         (* (and +whitespace
                  (or "<=" "<" "==" "!=" ">=" ">")
-                 +whitespace/all
+                 +whitespace
                  math-expression)))
   (:function process-nary-infix-expression))
 
@@ -86,17 +86,17 @@
 
 (esrap:defrule sum
     (and product
-         (* (and +whitespace/all
+         (* (and +whitespace
                  (or #\+ #\-)
-                 +whitespace/all
+                 +whitespace
                  product)))
   (:function process-nary-infix-expression))
 
 (esrap:defrule product
     (and optional-expt
-         (* (and +whitespace/all
+         (* (and +whitespace
                  (or #\* #\/)
-                 +whitespace/all
+                 +whitespace
                  optional-expt)))
   (:function process-nary-infix-expression))
 
@@ -105,9 +105,9 @@
 
 (esrap:defrule expt
     (and infix-non-assignment
-         +whitespace/all
+         +whitespace
          #\^
-         +whitespace/all
+         +whitespace
          infix-non-assignment)
   (:function process-binary-infix-expression))
 
@@ -127,9 +127,9 @@
 
 (esrap:defrule infix-non-assignment
     (and optional-unary-minus
-         (* (and +whitespace/all
+         (* (and +whitespace
                  infix-macro-symbol
-                 +whitespace/all
+                 +whitespace
                  optional-unary-minus)))
   (:function process-nary-infix-expression))
 
