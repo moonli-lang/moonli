@@ -53,6 +53,7 @@
 (defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
   (eval `(push :sb-aclrepl ,(find-symbol "*CONTRIB-BLACKLIST*" :moonli)))
   (uiop:symbol-call :moonli '#:require-all-contribs)
+  (asdf:clear-configuration)
   (uiop:dump-image (asdf:output-file o c)
                    :executable t
                    :compression t))

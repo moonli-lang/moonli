@@ -65,10 +65,6 @@
          (ic-repl:*output-marker* "#=> ")
          (ic-repl:*values-separator* ", "))
 
-    (asdf:initialize-source-registry (list :source-registry
-                                           (list :directory (uiop:getcwd))
-                                           :inherit-configuration))
-
     (multiple-value-bind (options free-args)
 
         (handler-case
