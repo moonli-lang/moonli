@@ -50,100 +50,101 @@
                     :do (ic:highlight henv start (- end start) hl-class)))))
 
 (defun main (&optional (argv (opts:argv) argvp))
-  (let* ((ic-repl:*read-function*
-           (lambda (stream)
-             (moonli:read-moonli-from-string
-              (with-output-to-string (out)
-                (loop :while (listen stream)
-                      :do (write-char (read-char stream) out))))))
-         (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*)
-         (*print-case* :downcase)
-         (*print-pretty* t)
-         (*print-length* 10)
-         (ic-repl:*debugger-enabled-p* nil)
-         (*debugger-hook* 'ic-repl:debugger)
-         (ic-repl:*output-marker* "#=> ")
-         (ic-repl:*values-separator* ", "))
+  (ic-repl:with-truncated-backtrace ()
+    (let* ((ic-repl:*read-function*
+             (lambda (stream)
+               (moonli:read-moonli-from-string
+                (with-output-to-string (out)
+                  (loop :while (listen stream)
+                        :do (write-char (read-char stream) out))))))
+           (*print-pprint-dispatch* moonli::*moonli-pprint-dispatch*)
+           (*print-case* :downcase)
+           (*print-pretty* t)
+           (*print-length* 10)
+           (ic-repl:*debugger-enabled-p* nil)
+           (*debugger-hook* 'ic-repl:debugger)
+           (ic-repl:*output-marker* "#=> ")
+           (ic-repl:*values-separator* ", "))
 
-    (multiple-value-bind (options free-args)
+      (multiple-value-bind (options free-args)
 
-        (handler-case
-            (if argvp (opts:get-opts argv) (opts:get-opts))
-          (error (e)
-            (format uiop:*stderr* "~a: ~a"
-                    (class-name (class-of e))
-                    e)
-            (uiop:print-backtrace :stream uiop:*stderr* :condition e)
-            (format t "try `moonli-repl --help`.~&")
-            (uiop:quit 1)))
+          (handler-case
+              (if argvp (opts:get-opts argv) (opts:get-opts))
+            (error (e)
+              (format uiop:*stderr* "~a: ~a"
+                      (class-name (class-of e))
+                      e)
+              (uiop:print-backtrace :stream uiop:*stderr* :condition e)
+              (format t "try `moonli-repl --help`.~&")
+              (uiop:quit 1)))
 
-      (handler-bind ((error
-                       (lambda (c)
-                         (print-error-and-backtrace c *error-output*)
-                         (when free-args (uiop:quit 1)))))
+        (handler-bind ((error
+                         (lambda (c)
+                           (print-error-and-backtrace c *error-output* (ic-repl:backtrace-as-list))
+                           (when free-args (uiop:quit 1)))))
 
-        (let ((processors nil))
-          (alexandria:doplist (key arg options)
-            (push (process-option key arg) processors))
-          (setf processors (stable-sort processors #'> :key #'car))
+          (let ((processors nil))
+            (alexandria:doplist (key arg options)
+              (push (process-option key arg) processors))
+            (setf processors (stable-sort processors #'> :key #'car))
 
-          (setf moonli:*site-init-path*
-                (uiop:native-namestring
-                 (merge-pathnames ".moonlirc" (user-homedir-pathname))))
-
-          ;; Process options with positive priorities
-          (dolist (processor processors)
-            (when (< 0 (car processor))
-              (funcall (cdr processor))))
-
-          (unless (boundp 'ic-repl:*history-file*)
-            (setf ic-repl:*history-file*
+            (setf moonli:*site-init-path*
                   (uiop:native-namestring
-                   (merge-pathnames ".moonli-repl" (user-homedir-pathname)))))
+                   (merge-pathnames ".moonlirc" (user-homedir-pathname))))
 
-          ;; Finally process options with non-positive priorities
-          (dolist (processor processors)
-            (when (>= 0 (car processor))
-              (funcall (cdr processor)))))
+            ;; Process options with positive priorities
+            (dolist (processor processors)
+              (when (< 0 (car processor))
+                (funcall (cdr processor))))
 
-        ;; If it was a funcall, pass rest of the arguments to it.
-        (cond ((getf options :funcall)
-               (let ((results (multiple-value-list
-                               (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
-                                       ,@(mapcar (lambda (arg)
-                                                   (handler-case
-                                                       (esrap:parse 'moonsh-atomic-expression arg)
-                                                     (esrap:esrap-parse-error () arg)))
-                                                 free-args))))))
-                 (loop :for i :from 0
-                       :for result :in results
-                       :do (unless (zerop i)
-                             (write-string ic-repl:*values-separator*))
-                           (if (stringp result)
-                               (write-string result)
-                               (write result))))
-               (terpri)
-               (uiop:quit 0))
-              (free-args
-               ;; Otherwise process scripts
-               (dolist (script-file free-args)
-                 (funcall (cdr (process-option :load script-file))))
-               (uiop:quit 0)))))
+            (unless (boundp 'ic-repl:*history-file*)
+              (setf ic-repl:*history-file*
+                    (uiop:native-namestring
+                     (merge-pathnames ".moonli-repl" (user-homedir-pathname)))))
 
-    (ensure-site-init-loaded)
+            ;; Finally process options with non-positive priorities
+            (dolist (processor processors)
+              (when (>= 0 (car processor))
+                (funcall (cdr processor)))))
 
-    (unless *silent*
-      (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))
-      (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*)
-      (ic:term-italic t)
-      (ic:println "  Press F1 to see available keybindings.")
-      (ic:term-italic nil)
-      (terpri))
+          ;; If it was a funcall, pass rest of the arguments to it.
+          (cond ((getf options :funcall)
+                 (let ((results (multiple-value-list
+                                 (eval `(,(funcall (cdr (process-option :funcall (getf options :funcall))))
+                                         ,@(mapcar (lambda (arg)
+                                                     (handler-case
+                                                         (esrap:parse 'moonsh-atomic-expression arg)
+                                                       (esrap:esrap-parse-error () arg)))
+                                                   free-args))))))
+                   (loop :for i :from 0
+                         :for result :in results
+                         :do (unless (zerop i)
+                               (write-string ic-repl:*values-separator*))
+                             (if (stringp result)
+                                 (write-string result)
+                                 (write result))))
+                 (terpri)
+                 (uiop:quit 0))
+                (free-args
+                 ;; Otherwise process scripts
+                 (dolist (script-file free-args)
+                   (funcall (cdr (process-option :load script-file))))
+                 (uiop:quit 0)))))
 
-    (setf ql-setup:*quicklisp-home*
-          (make-pathname :defaults "~/quicklisp/"))
-    (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
-    (ic:set-default-highlighter (cffi:callback highlighter) (cffi:null-pointer))
-    (ic:set-prompt-marker "> " "")
-    (ic:enable-multiline-indent nil)
-    (ic-repl:repl)))
+      (ensure-site-init-loaded)
+
+      (unless *silent*
+        (ic:println (format nil "[color=~a]~a[/color]" *logo-color* *logo*))
+        (format t "~a~%~a~%~a~%~%" *versions* *copy* *maintain*)
+        (ic:term-italic t)
+        (ic:println "  Press F1 to see available keybindings.")
+        (ic:term-italic nil)
+        (terpri))
+
+      (setf ql-setup:*quicklisp-home*
+            (make-pathname :defaults "~/quicklisp/"))
+      (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
+      (ic:set-default-highlighter (cffi:callback highlighter) (cffi:null-pointer))
+      (ic:set-prompt-marker "> " "")
+      (ic:enable-multiline-indent nil)
+      (ic-repl:repl))))
