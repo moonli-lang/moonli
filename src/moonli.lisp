@@ -130,11 +130,12 @@ prior to transpilation errors.
                           (unless (typep expr 'comment)
                             (eval expr))
                           (setf file-position pos))
-                        (esrap:parse `(or #\;
-                                          whitespace
-                                          moonli-expression)
-                                     file-contents
-                                     :start file-position)))))))
+                        (multiple-value-bind (ws new-pos)
+                            (esrap:parse `(or #\; whitespace)
+                                         file-contents
+                                         :start file-position)
+                          (declare (ignore ws))
+                          (setf file-position new-pos))))))))
 
 (defun may-be-eval-form (form)
   (let ((expanded (swank/backend:macroexpand-all form)))
