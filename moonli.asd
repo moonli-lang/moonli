@@ -42,7 +42,7 @@
                (:file "moonli")
                (:file "pretty-printer")
                (:file "binary")
-               (:file "contribs"))
+               (:file "contribs" :if-feature :sbcl))
   :perform (test-op (c s)
              (eval (read-from-string "(5AM:RUN! :MOONLI)")))
   :build-operation "program-op"
