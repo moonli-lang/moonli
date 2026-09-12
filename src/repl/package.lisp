@@ -14,7 +14,8 @@
   (:local-nicknames (:ic :isocline)
                     (:ic-repl :isocline-repl))
   (:import-from #:isocline-repl
-                #:completer)
+                #:completer
+                #:print-error-and-backtrace)
   (:import-from #:moonli
                 #:process-option
                 #:moonsh-atomic-expression

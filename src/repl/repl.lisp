@@ -83,9 +83,7 @@
 
       (handler-bind ((error
                        (lambda (c)
-                         (format *error-output* "~A" c)
-                         (uiop:print-backtrace
-                          :condition c :stream *error-output*)
+                         (print-error-and-backtrace c *error-output*)
                          (when free-args (uiop:quit 1)))))
 
         (let ((processors nil))
