@@ -112,7 +112,10 @@ prior to transpilation errors.
         (load lisp-file)
         (load debug-file))
       (let ((file-contents (alexandria:read-file-into-string moonli-file))
-            (file-position 0))
+            (file-position 0)
+            ;; CLHS asks implementations to bind *package* and *readtable*
+            (*package* *package*)
+            (*readtable* *readtable*))
         (loop :while (and file-position
                           (< file-position (length file-contents)))
               :do (multiple-value-bind (expr pos success)
