@@ -14,7 +14,7 @@
 
 (esrap:defrule string
     (and #\"
-         (* (or (and #\\ #\")
+         (* (or (and #\\ character)
                 (not #\")))
          #\")
   (:lambda (expr esrap:&bounds start end)
@@ -26,7 +26,7 @@
           (cons
            (assert (and (null (cddr elt))
                         (string= "\\" (first elt))))
-           (write-string (second elt) s)))))))
+           (write-char (second elt) s)))))))
 
 (esrap:defrule string-designator
     (or string expr:symbol))
