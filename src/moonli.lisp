@@ -166,10 +166,10 @@ prior to transpilation errors.
                              :if-does-not-exist :create
                              :if-exists :supersede
                              :direction :output)
-        (let ((*package* (find-package :moonli)))
-          (write `(in-package :moonli) :stream debug :case :downcase)
-          (terpri debug))
         (with-standard-io-syntax
+          (let ((*package* (find-package :moonli)))
+            (write `(in-package :moonli) :stream debug :case :downcase)
+            (terpri debug))
           (let ((*print-pretty* t))
             (format out ";;; This file was automatically generated.~%")
             (format out ";;; Do NOT edit by hand. It will be overwritten.~%")
@@ -181,8 +181,7 @@ prior to transpilation errors.
                 (push (third (gethash form *transpilation-definition-source-form-table*))
                       debug-loc))
               (unless (comment-p form) (format out "~%"))
-              (may-be-eval-form form))))
-        (with-standard-io-syntax
+              (may-be-eval-form form)))
           (let* ((*print-pretty* t)
                  (*package* (find-package :moonli)))
             (loop :for form :in (cdr target)
@@ -227,10 +226,11 @@ prior to transpilation errors.
 (defun compile-moonli-file (source-file fasl-file)
   (multiple-value-bind (lisp-source-file debug-file)
       (transpile-moonli-file source-file)
-    (asdf:compile-file* lisp-source-file :output-file fasl-file)
-    (asdf:compile-file* debug-file
-                        :output-file (make-pathname :defaults fasl-file
-                                                    :type (uiop:strcat "debug." (pathname-type fasl-file))))))
+    (with-standard-io-syntax
+      (asdf:compile-file* lisp-source-file :output-file fasl-file)
+      (asdf:compile-file* debug-file
+                          :output-file (make-pathname :defaults fasl-file
+                                                      :type (uiop:strcat "debug." (pathname-type fasl-file)))))))
 
 #|
 1. We want an extensible system to recognize moonli macros such as "LET". ; ;
