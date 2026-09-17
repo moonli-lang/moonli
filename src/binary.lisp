@@ -164,6 +164,7 @@
         (let ((processors nil))
           (alexandria:doplist (key arg options)
             (push (process-option key arg) processors))
+          (alexandria:nreversef processors)
           (setf processors (stable-sort processors #'> :key #'car))
           (mapcar #'funcall (mapcar #'cdr processors)))
 
