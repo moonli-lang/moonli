@@ -1,11 +1,16 @@
 (uiop:define-package :moonli-user
-  (:mix-reexport #:cl #:let-plus #:for #:parse-float)
+  (:mix-reexport #:cl #:let-plus #:for #:parse-float #:trivial-posix-fs)
   (:import-from #:moonli #:lm #:ifelse)
   (:import-from #:binding-arrows #:-> #:->>)
+  (:import-from #:docsearch #:docsearch)
+  (:local-nicknames (#:fs #:org.shirakumo.file-attributes))
   (:export #:lm
            #:ifelse
            #:->
-           #:->>))
+           #:->>
+           #:docsearch
+           #:help
+           #:run))
 
 (trivial-package-local-nicknames:add-package-local-nickname '#:json '#:com.inuoe.jzon '#:moonli-user)
 

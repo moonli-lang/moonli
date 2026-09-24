@@ -53,6 +53,11 @@
 (defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
   (eval `(push :sb-aclrepl ,(find-symbol "*CONTRIB-BLACKLIST*" :moonli)))
   (uiop:symbol-call :moonli '#:require-all-contribs)
+  (when (find-package :cffi)
+    (mapc (fdefinition (find-symbol "CLOSE-FOREIGN-LIBRARY" "CFFI"))
+          (remove (find-symbol "LIBISOCLINE" "ISOCLINE")
+                  (uiop:symbol-call :cffi "LIST-FOREIGN-LIBRARIES")
+                  :key (find-symbol "FOREIGN-LIBRARY-NAME" "CFFI"))))
   (asdf:clear-configuration)
   (uiop:dump-image (asdf:output-file o c)
                    :executable t
@@ -64,14 +69,16 @@
   :components ((:file "asdf")))
 
 (defsystem "moonli/repl"
-  :depends-on ("ql-https"
-               "uiop"
+  :depends-on ("uiop"
                "moonli"
                "binding-arrows"
                "isocline-repl"
                "for"
-               "com.inuoe.jzon"
+
                "parse-float"
+               "trivial-posix-fs"
+               "com.inuoe.jzon"
+               "file-attributes"
                "trivial-package-local-nicknames")
   :build-operation "program-op"
   :build-pathname "../moonli.repl"
@@ -79,12 +86,14 @@
   :pathname #p"src/"
   :license "MIT"
   :serial t
-  :components ((:file "repl/package")
+  :components ((:module "repl"
+                :components ((:file "package")
+                             (:file "utils")
+                             (:file "opts")
+                             (:file "repl")))
                (:module "extra-macros"
                 :components ((:file "for")
-                             (:file "arrows")))
-               (:file "repl/opts")
-               (:file "repl/repl")))
+                             (:file "arrows")))))
 
 (defsystem "moonli/ciel"
   :depends-on ("moonli/repl"
@@ -101,3 +110,130 @@
   :depends-on ("moonli"
                "alive-lsp")
   :components ((:file "alive-lsp")))
+
+(defsystem "moonli/curated-libraries"
+  :description "A collection of curated libraries designed to correspond with the functionalities of Python's standard libraries."
+  :depends-on (;; Threading
+               "bordeaux-threads"
+
+               ;; Text Processing Services
+               "cl-ppcre"
+               "str"
+
+               ;; Numeric and Mathematical Libraries
+               "array-operations"
+               "nibbles"
+
+               ;; Functional Programming Libraries
+               "alexandria"
+               "coalton"
+               "fset"
+
+               ;; File and Directory Access
+               "file-finder"
+               "trivial-posix-fs" ; experimental
+               "file-attributes"
+
+               ;; Data Persistence
+               ;; "postmodern" ; FIXME: depends on ironclad
+               ;; "mito" ; FIXME: depends on ironclad
+               "clsql"
+               "bknr.datastore"  ; FIXME: depends on ironclad
+
+               ;; TODO: Data Compression and Archiving
+
+               ;; File Formats
+               "file-formats"
+               "com.inuoe.jzon"
+               "shasht"
+               "fare-csv"
+
+               ;; Cryptographic Services
+               ;; FIXME: https://github.com/sharplispers/ironclad/issues/82
+               ;; "ironclad"
+
+               ;; TODO: Generic Operating System Services
+
+               ;; Command-line Interface
+               "unix-opts"
+               "clingon"
+
+               ;; Concurrent Execution
+               "lparallel"
+
+               ;; TODO: Internet Data Handling
+
+               ;; TODO: Structured Markup Processing Tools
+
+               ;; Internet Protocols and Support
+               "usocket"
+               "hunchentoot"
+               "hunchensocket"
+               "dexador"
+
+               ;; TODO: Multimedia Services
+
+               ;; Internationalization
+
+               "local-time"
+
+               ;; Graphical User Interfaces
+               "clog"
+               "ltk"
+               "isocline-repl"
+
+               ;; Development Tools
+               "esrap"
+               "quicksearch"
+               "quickproject"
+               (:feature (:not :ql-https) "ql-https")
+               (:feature (:not :swank) "swank")
+               "trivial-package-local-nicknames"
+
+               ;; Debugging and Profiling
+               "swank"
+               "log4cl"
+
+               ;; Software Packaging and Distribution
+               "deploy"
+
+               ;; TODO: Runtime Services
+               "closer-mop"
+
+               ;; TODO: Language Services
+               "trivial-features"
+               "policy-cond"
+               "cl-environments"
+               "cl-form-types"
+               "float-features"
+
+               ;; Foreign Libraries
+               "cffi"
+               "cl-autowrap"
+               "py4cl2"
+               "py4cl2-cffi"
+
+               ;; Iteration
+               "iterate"
+               "series"
+               "picl"
+
+               ;; Pattern Matching
+               "optima"
+
+               ;; Code Generation
+               "cl-who"
+               "parenscript"
+
+               ;; Documentation
+               ;; "mgl-pax" ; FIXME: depends on ironclad
+               "docsearch"
+
+
+               ;; Testing
+               "fiveam"
+
+               ;; TODO: Windows specific
+
+               ;; Unix Specific
+               "osicat"))
