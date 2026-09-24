@@ -90,7 +90,9 @@
                          (format s "Expected ~a" expectation)
                          (format s "Unexpected token."))))
                (terpri s)
-               (format s "~%~{~A~^~%~}" may-be-errors)
+               (format s "~%~{~A~^~%~}"
+                       (remove-duplicates (mapcar #'write-to-string may-be-errors)
+                                          :test #'string=))
                (terpri s)))))
 
 (define-condition moonli-may-be-parse-error (condition) ())
