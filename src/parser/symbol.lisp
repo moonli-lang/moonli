@@ -56,6 +56,12 @@ interning them.")
                (format s "Did you mean to use ~S instead of ~S?"
                        expected actual)))))
 
+(define-condition not-good-symbol (moonli-may-be-parse-error)
+  ((symbol :initarg :symbol))
+  (:report (lambda (c s)
+             (with-slots (symbol) c
+               (format s "Expected to be a non-macro symbol, but perhaps ~S is a macro?~%  May be try quoting? Or use another symbol" symbol)))))
+
 
 (defvar *moonli-macro-functions* (make-hash-table))
 (defun expand-moonli-macro (expression)
@@ -141,13 +147,17 @@ interning them.")
                 (null (find-symbol name (find-package package))))
         (return-from good-symbol-p t))
       (setf symbol (find-symbol name (find-package package)))))
-  (not (or (member symbol '(end elif else)
-                   :test #'string-equal)
-           (gethash symbol *moonli-macro-functions*)
-           (gethash symbol *moonli-short-macro-functions*)
-           (gethash symbol *moonli-infix-macro-functions*)
-           (ignore-errors
-            (parse-number:parse-number (symbol-name symbol))))))
+  (if (not (or (member symbol '(end elif else)
+                       :test #'string-equal)
+               (gethash symbol *moonli-macro-functions*)
+               (gethash symbol *moonli-short-macro-functions*)
+               (gethash symbol *moonli-infix-macro-functions*)
+               (ignore-errors
+                (parse-number:parse-number (symbol-name symbol)))))
+      t
+      (progn
+        (signal 'not-good-symbol :symbol symbol)
+        nil)))
 
 (esrap:defrule good-symbol (good-symbol-p expr:symbol)
   (:error-report :context))
