@@ -13,25 +13,32 @@
 
 
 (defmacro define-moonli-macro (name &body (moonli-macro-bindings . body))
-  (alexandria:with-gensyms (expr subexpr args oidx idx symbol)
+  (alexandria:with-gensyms (expr subexpr args oidx idx symbol end-sym start-pos end-pos)
     (let* ((namep (namep-symbol name))
            (macro-rule `(and (,namep expr:symbol)
                              +whitespace
                              ,@(mapcar #'second moonli-macro-bindings)
                              *whitespace "end"
                              (esrap:? +whitespace/internal)
-                             (esrap:? (,namep expr:symbol)))))
+                             (esrap:? expr:symbol))))
       `(progn
          (defun ,namep (,symbol)
            (eq ,symbol ',name))
          (esrap:defrule ,name
              ,macro-rule
-           (:function (lambda (,args)
-                        (declare (optimize debug))
-                        (optima:ematch (cddr ,args)
-                          ((list ,@(mapcar #'first moonli-macro-bindings)
-                                 _ "end" _ (or nil ',name))
-                           ,@body))))
+           (:lambda (,args esrap:&bounds ,start-pos ,end-pos)
+             (declare (optimize debug)
+                      (ignore ,start-pos))
+             (optima:ematch (cddr ,args)
+               ((list ,@(mapcar #'first moonli-macro-bindings)
+                      _ "end" _ ,end-sym)
+                (unless (or (null ,end-sym)
+                            (eq ',name ,end-sym))
+                  (error 'moonli-parse-error
+                         :position (- ,end-pos
+                                      (length (string ,end-sym)))
+                         :expectation (format nil "'~S'" ',name)))
+                ,@body)))
            (:error-report t))
          (let* ((,oidx (gethash ',name *moonli-macro-functions*))
                 (,expr (esrap:rule-expression
