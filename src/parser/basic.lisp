@@ -55,7 +55,7 @@
     (with-output-to-string (*standard-output*)
       (write-string (subseq string 0 nn))
       (write-char #\newline)
-      (loop :repeat start-dist :do (write-char #\-))
+      (loop :repeat (- start-dist 1) :do (write-char #\-))
       (write-char #\^)
       (loop :repeat (- end-dist 1) :do (write-char #\-))
       (when (member (char string position) '(#\( #\{ #\[) :test #'char=)
