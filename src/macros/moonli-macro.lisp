@@ -18,7 +18,7 @@
 
 (esrap:defrule let-bindings
     (and let-binding
-         (* (and ","
+         (* (and mandatory-comma
                  +whitespace
                  let-binding
                  *whitespace)))
@@ -32,7 +32,7 @@
 
   ((let-bindings let-bindings)
    (_ *whitespace/internal)
-   (_ ":")
+   (_ mandatory-colon)
    (let-body (esrap:? moonli)))
 
   `(let ,let-bindings
