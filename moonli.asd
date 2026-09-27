@@ -237,4 +237,5 @@
                ;; TODO: Windows specific
 
                ;; Unix Specific
-               "osicat"))
+               (:feature (:not :windows) "osicat") ; apparantly, it's supposed to work on windows, but it does not, not out of the box anyways
+               ))
