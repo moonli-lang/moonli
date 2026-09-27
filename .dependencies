@@ -1,4 +1,6 @@
-("asdf" :git "https://gitlab.common-lisp.net/asdf/asdf.git")
 ("definitions" :git "https://codeberg.org/digikar/definitions.git" :branch "swank")
 ("peltadot" :git "https://gitlab.com/digikar/peltadot")
 ("cl-isocline" :git "https://github.com/digikar99/cl-isocline")
+("trivial-posix-fs" :git "https://codeberg.org/digikar/trivial-posix-fs")
+("file-formats" :git "https://codeberg.org/digikar/file-formats")
+("docsearch" :git "https://github.com/digikar99/cl-docsearch")

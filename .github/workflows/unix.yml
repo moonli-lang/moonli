@@ -15,6 +15,7 @@ jobs:
           [macos-latest, darwin],
           [macos-15-intel, darwin]
         ]
+    container: ${{ contains(matrix.runner_os[1], 'linux') && 'ghcr.io/digikar99/oldglibc-openssl35-commonlisp:glibc_2_28' || '' }}
     runs-on: ${{ matrix.runner_os[0] }}
 
     defaults:
@@ -23,12 +24,12 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
 
     - name: Update $PATH
       run: |
         echo $PATH
-        echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=$HOME/bin:$HOME/.local/bin:$PATH" >> $GITHUB_ENV
 
     - name: Check $PATH
       run: echo $PATH
@@ -54,7 +55,7 @@ jobs:
         echo "ARCH=${ARCH}" >> ${GITHUB_ENV}
         echo "OS=${OS}" >> ${GITHUB_ENV}
         bash --version
-        bash <(curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh)
+        curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh | bash
 
     - name: Download download-dependencies
       run: |
@@ -77,10 +78,10 @@ jobs:
         cmake ../..
         cmake --build .
 
-    - name: Install libssl libtls
+    - name: Install system libraries
       run: |
         if [ "$OS" == "linux" ]; then
-            sudo apt install -y openssl libssl-dev libtls-dev atool
+            yum -y install atool
         elif [ "$OS" == "darwin" ]; then
             brew install openssl libretls atool
         fi
@@ -88,20 +89,21 @@ jobs:
     - name: Statically link against libisocline + libcrypto, libssl, libtls
       run: |
         case ${OS} in
-            linux) SYS_LIBDIR="/usr/lib/" ;;
+            linux) SYS_LIBDIR="$STATIC_PREFIX" ;;
             darwin) SYS_LIBDIR="$(brew --prefix)" ;;
         esac
 
         LIBCRYPTO=$(find $SYS_LIBDIR -name "libcrypto.a" | head -1)
         LIBSSL=$(find $SYS_LIBDIR -name "libssl.a" | head -1)
         LIBTLS=$(find $SYS_LIBDIR -name "libtls.a" | head -1)
+        LIBZSTD=$(find $SYS_LIBDIR -name "libzstd.a" | head -1)
         LIBISOCLINE="$HOME/quicklisp/local-projects/cl-isocline/isocline/build/release/libisocline.a"
 
         if [ "$OS" == "linux" ]; then
-            SBCL_DIR="/home/runner/sbcl-2.6.6+r00-$ARCH-$OS"
-            export WHOLE_ARCHIVES="-Wl,--whole-archive $LIBCRYPTO $LIBSSL $LIBTLS $LIBISOCLINE"
+            SBCL_DIR="/github/home/sbcl-2.6.8+r00-$ARCH-$OS"
+            export WHOLE_ARCHIVES="-Wl,--whole-archive $LIBCRYPTO $LIBSSL $LIBISOCLINE -Wl,--no-whole-archive $LIBTLS"
         elif [ "$OS" == "darwin" ]; then
-            SBCL_DIR="/Users/runner/sbcl-2.6.6+r00-$ARCH-$OS"
+            SBCL_DIR="/Users/runner/sbcl-2.6.8+r00-$ARCH-$OS"
             # -force_load only works on one library at a time
             export WHOLE_ARCHIVES="-Wl,-force_load $LIBCRYPTO -Wl,-force_load $LIBSSL -Wl $LIBTLS -Wl,-force_load $LIBISOCLINE"
         fi
@@ -136,15 +138,26 @@ jobs:
         overwrite: 'true'
         files: ${{ env.CORE }}.bin
 
+    - name: Download CIEL libraries
+      run: |
+        CIEL=2026-09-17
+        wget https://github.com/digikar99/ciel-libraries/releases/download/weekly-$CIEL/ciel-libraries-$CIEL.tar.gz
+        atool -x ciel-libraries-$CIEL.tar.gz
+        mv ciel-libraries-$CIEL/* $HOME/quicklisp/local-projects/
+        rm ciel-libraries-$CIEL.tar.gz
+
+    - name: Install ultralisp
+      run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
+
 
     - name: Prepare moonli-repl
       run: |
         cl --eval '(push "./" ql:*local-project-directories*)' \
            --eval '(ql:quickload "moonli/repl")' \
+           --eval '(ql:quickload "moonli/curated-libraries")' \
            --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
            --eval "(asdf:make :moonli/repl)"
         mv moonli.repl ${{ env.REPL_CORE }}.bin
-
 
     - name: Upload moonli-repl
       uses: actions/upload-artifact@v4
@@ -161,37 +174,31 @@ jobs:
         overwrite: 'true'
         files: ${{ env.REPL_CORE }}.bin
 
-
-    - name: Install ultralisp
-      run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
-
-
-    # FIXME: https://github.com/ciel-lang/CIEL/issues/97
-    # - name: Prepare moonli-ciel
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   continue-on-error: true
-    #   run: |
-    #     cl --eval '(push "./" ql:*local-project-directories*)' \
-    #         --eval '(ql:quickload "moonli/ciel")' \
-    #         --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
-    #         --eval '(asdf:make "moonli/ciel")'
-    #     mv moonli.ciel ${{ env.CIEL_CORE }}.bin
+    - name: Prepare moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
+      run: |
+        cl --eval '(push "./" ql:*local-project-directories*)' \
+           --eval '(ql:quickload "moonli/ciel")' \
+           --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+           --eval '(asdf:make "moonli/ciel")'
+        mv moonli.ciel ${{ env.CIEL_CORE }}.bin
 
 
-    # - name: Upload moonli-ciel
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   continue-on-error: true
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: ${{ env.CIEL_CORE }}.bin
-    #     path: ${{ env.CIEL_CORE }}.bin
+    - name: Upload moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.CIEL_CORE }}.bin
+        path: ${{ env.CIEL_CORE }}.bin
 
 
-    # - name: Publish moonli-ciel
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   continue-on-error: true
-    #   uses: SierraSoftworks/gh-releases@v1.0.4
-    #   with:
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     overwrite: 'true'
-    #     files: ${{ env.CIEL_CORE }}.bin
+    - name: Publish moonli-ciel
+      if: startsWith(github.ref, 'refs/tags/')
+      continue-on-error: true
+      uses: SierraSoftworks/gh-releases@v1.0.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        overwrite: 'true'
+        files: ${{ env.CIEL_CORE }}.bin

@@ -41,7 +41,7 @@ jobs:
         pwd
         ls -l
         bash --version
-        bash <(curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh)
+        curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh | bash
 
     - name: Download download-dependencies
       run: |
@@ -67,7 +67,7 @@ jobs:
 
     - name: Statically link against libisocline + libcrypto, libssl
       run: |
-        SBCL_DIR="sbcl-2.6.6+r00-x86-64-windows"
+        SBCL_DIR="sbcl-2.6.8+r00-x86-64-windows"
         SYS_LIBDIR="/mingw64/lib"
         LIBCRYPTO="${SYS_LIBDIR}/libcrypto.a ${SYS_LIBDIR}/libcrypt32.a"
         LIBSSL=${SYS_LIBDIR}/libssl.a
@@ -101,10 +101,23 @@ jobs:
         files: ${{ env.CORE }}.exe
 
 
+    - name: Download CIEL libraries
+      run: |
+        CIEL=2026-09-17
+        wget https://github.com/digikar99/ciel-libraries/releases/download/weekly-$CIEL/ciel-libraries-$CIEL.tar.gz
+        atool -x ciel-libraries-$CIEL.tar.gz
+        mv ciel-libraries-$CIEL/* $HOME/quicklisp/local-projects/
+        rm ciel-libraries-$CIEL.tar.gz
+
+    - name: Install ultralisp
+      run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
+
+
     - name: Prepare moonli-repl
       run: |
         cl --eval '(push "./" ql:*local-project-directories*)' \
            --eval '(ql:quickload "moonli/repl")' \
+           --eval '(ql:quickload "moonli/curated-libraries")' \
            --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
            --eval '(asdf:make "moonli/repl")'
         mv moonli.repl.exe ${{ env.REPL_CORE }}.exe
@@ -124,10 +137,8 @@ jobs:
         files: ${{ env.REPL_CORE }}.exe
 
 
-    - name: Install ultralisp
-      run: cl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
-
-    # FIXME: https://github.com/ciel-lang/CIEL/issues/97
+    # cl-isocline-repl still fails to build CIEL on windows
+    # So, let's avoid building it until that is successful.
     # - name: Prepare moonli-ciel
     #   if: startsWith(github.ref, 'refs/tags/')
     #   continue-on-error: true

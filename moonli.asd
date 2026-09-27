@@ -75,6 +75,7 @@
                "isocline-repl"
                "for"
 
+               "docsearch"
                "parse-float"
                "trivial-posix-fs"
                "com.inuoe.jzon"
