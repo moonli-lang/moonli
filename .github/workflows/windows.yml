@@ -22,7 +22,7 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
       with:
-        install: git curl zip gcc atool libzstd-devel mingw-w64-x86_64-zstd mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-ucrt-x86_64-github-cli
+        install: git curl zip gcc atool libzstd-devel mingw-w64-x86_64-zstd mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-x86_64-sqlite3 mingw-w64-ucrt-x86_64-github-cli
 
     - name: Check $PATH
       run: echo $PATH
