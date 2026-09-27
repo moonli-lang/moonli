@@ -135,10 +135,10 @@
                "file-attributes"
 
                ;; Data Persistence
-               ;; "postmodern" ; FIXME: depends on ironclad
-               ;; "mito" ; FIXME: depends on ironclad
+               "postmodern"
+               "mito"
                "clsql"
-               "bknr.datastore"  ; FIXME: depends on ironclad
+               "bknr.datastore"
 
                ;; TODO: Data Compression and Archiving
 
@@ -149,8 +149,7 @@
                "fare-csv"
 
                ;; Cryptographic Services
-               ;; FIXME: https://github.com/sharplispers/ironclad/issues/82
-               ;; "ironclad"
+               "ironclad"
 
                ;; TODO: Generic Operating System Services
 
@@ -206,6 +205,7 @@
                "cl-environments"
                "cl-form-types"
                "float-features"
+               "trivial-garbage"
 
                ;; Foreign Libraries
                "cffi"
@@ -226,7 +226,7 @@
                "parenscript"
 
                ;; Documentation
-               ;; "mgl-pax" ; FIXME: depends on ironclad
+               "mgl-pax"
                "docsearch"
 
 
