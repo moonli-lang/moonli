@@ -139,7 +139,7 @@
                "postmodern"
                "mito"
                "clsql"
-               "bknr.datastore"
+               ;; "bknr.datastore" ; does not load on windows, also unmaintained now
 
                ;; TODO: Data Compression and Archiving
 
