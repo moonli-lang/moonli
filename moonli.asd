@@ -178,7 +178,7 @@
                "local-time"
 
                ;; Graphical User Interfaces
-               "clog"
+               (:feature (:not :windows) "clog") ; depends on libsqlite3, does not load on windows, not out of the box anyways
                "ltk"
                "isocline-repl"
 
