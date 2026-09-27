@@ -132,7 +132,7 @@
 
                ;; File and Directory Access
                "file-finder"
-               "trivial-posix-fs" ; experimental
+               ;; "trivial-posix-fs" ; experimental
                "file-attributes"
 
                ;; Data Persistence
@@ -144,7 +144,7 @@
                ;; TODO: Data Compression and Archiving
 
                ;; File Formats
-               "file-formats"
+               ;; "file-formats" ; experimental
                "com.inuoe.jzon"
                "shasht"
                "fare-csv"
@@ -211,8 +211,8 @@
                ;; Foreign Libraries
                "cffi"
                "cl-autowrap"
-               "py4cl2"
-               "py4cl2-cffi"
+               ;; "py4cl2" ; experimental
+               ;; "py4cl2-cffi" ; experimental
 
                ;; Iteration
                "iterate"
