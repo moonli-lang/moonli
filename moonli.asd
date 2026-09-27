@@ -138,7 +138,7 @@
                ;; Data Persistence
                "postmodern"
                "mito"
-               "clsql"
+               (:feature (:not :windows) "clsql")
                ;; "bknr.datastore" ; does not load on windows, also unmaintained now
 
                ;; TODO: Data Compression and Archiving
