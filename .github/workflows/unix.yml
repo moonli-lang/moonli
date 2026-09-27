@@ -119,6 +119,7 @@ jobs:
       run: |
         cl --eval '(push "./" ql:*local-project-directories*)' \
            --eval '(ql:quickload "moonli")' \
+           --eval '(in-package :moonli-user)' \
            --eval "(asdf:make :moonli)"
         mv moonli ${{ env.CORE }}.bin
 
@@ -156,6 +157,7 @@ jobs:
            --eval '(ql:quickload "moonli/repl")' \
            --eval '(ql:quickload "moonli/curated-libraries")' \
            --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+           --eval '(in-package :moonli-user)' \
            --eval "(asdf:make :moonli/repl)"
         mv moonli.repl ${{ env.REPL_CORE }}.bin
 
@@ -181,6 +183,7 @@ jobs:
         cl --eval '(push "./" ql:*local-project-directories*)' \
            --eval '(ql:quickload "moonli/ciel")' \
            --eval "(cffi:close-foreign-library 'isocline::libisocline)" \
+           --eval '(in-package :ciel-user)' \
            --eval '(asdf:make "moonli/ciel")'
         mv moonli.ciel ${{ env.CIEL_CORE }}.bin
 
