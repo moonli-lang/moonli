@@ -101,7 +101,7 @@
                "ciel")
   :build-operation "program-op"
   :build-pathname "../moonli.ciel"
-  :entry-point "cl-repl:main"
+  :entry-point "moonli/repl:main"
   :pathname "src/"
   :license "MIT"
   :components ((:file "repl/ciel")))
