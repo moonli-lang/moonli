@@ -1,5 +1,5 @@
 (uiop:define-package :moonli-user
-  (:mix-reexport #:cl #:let-plus #:for #:parse-float #:trivial-posix-fs)
+  (:mix-reexport #:cl #:let-plus #:for #:parse-number #:trivial-posix-fs)
   (:import-from #:moonli #:lm #:ifelse)
   (:import-from #:binding-arrows #:-> #:->>)
   (:import-from #:docsearch #:docsearch)
