@@ -1,0 +1,578 @@
+version: 7
+platforms:
+- name: linux-64
+  virtual-packages:
+  - __unix=0=0
+  - __linux=4.18
+  - __glibc=2.28
+  - __archspec=0=x86_64
+environments:
+  default:
+    channels:
+    - url: https://prefix.dev/conda-forge/
+    - url: https://prefix.dev/common-lisp/common-lisp/
+    - url: https://conda.anaconda.org/conda-forge/
+    packages:
+      linux-64:
+      - conda: https://prefix.dev/common-lisp/common-lisp/linux-64/cl-isocline-0.0.0.2026.09.18-hb0f4dca_1.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/acclimation-0.0.0.2024.05.20-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/alexandria-0.0.0.2026.05.12-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/anaphora-0.9.8-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/binding-arrows-0.0.0.2024.03.28-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-asdf-3.3.7.4-h4616a5c_2.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-babel-0.0.0.2025.09.05-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-cffi-0.24.1.2026.08.21-h39481bf_3.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-docsearch-0.0.0.2026.02.12-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-for-0.0.0.2025.08.21-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-isocline-repl-0.0.0.2026.09.18-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-optima-0.0.0.2015.06.29-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-ppcre-2.1.2-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/closer-mop-0.0.0.2026.08.29-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/com.inuoe.jzon-0.0.0.2026.03.03-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/concrete-syntax-tree-0.3.0-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/definitions-0.0.0.2025.08.21-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/documentation-utils-0.0.0.2025.08.21-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/eclector-0.12.0-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/esrap-0.0.0.2025.10.10-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/file-attributes-0.0.0.2025.12.05-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/fiveam-1.4.3-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/flexi-streams-1.0.20-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/float-features-0.0.0.2026.08.19-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/form-fiddle-0.0.0.2025.08.21-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/lambda-fiddle-0.0.0.2025.08.21-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/let-plus-0.0.0.2018.03.07-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/net.didierverna.asdf-flv-2.2-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/parse-number-1.8-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/slime-2.32-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/styled-strings-0.0.0.2026.09.26-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-backtrace-0.0.0.2023.01.11-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-features-0.0.0.2026.09.08-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-gray-streams-0.0.0.2026.08.17-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-indent-0.0.0.2026.09.12-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-package-local-nicknames-0.0.0.2026.06.05-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-posix-fs-0.0.0.2026.10.04-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-with-current-source-form-0.0.0.2025.11.12-h4616a5c_0.conda
+      - conda: https://prefix.dev/common-lisp/common-lisp/noarch/unix-opts-0.0.0.2021.01.07-h4616a5c_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libgcc-16.2.0-ha9f2e26_7.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libgomp-16.2.0-he0feb66_7.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libzlib-1.3.2-h25fd6f3_3.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/sbcl-2.6.9-h7ddf93c_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_7.conda
+packages:
+- conda: https://prefix.dev/common-lisp/common-lisp/linux-64/cl-isocline-0.0.0.2026.09.18-hb0f4dca_1.conda
+  sha256: 3f91f4d758d9ae17aa69b0b17bd6c90af362defc28acbb1b125c7aff6fac9639
+  md5: 006befe7002981d4fc19d4d0e11dd7b3
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - cl-cffi
+  - libgcc >=16
+  license: MIT
+  run_exports: {}
+  size: 109493
+  timestamp: 1791011359368
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/acclimation-0.0.0.2024.05.20-h4616a5c_0.conda
+  sha256: bcd0e2adbfca2bedffa0caa49d22c9def9d72aedeaa036e74016485ad200959f
+  md5: 83bda4734bc02e0f601c29d85f1cef4c
+  depends:
+  - sbcl
+  - cl-asdf
+  license: BSD-2-Clause
+  run_exports: {}
+  size: 12048
+  timestamp: 1788986564049
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/alexandria-0.0.0.2026.05.12-h4616a5c_0.conda
+  sha256: 2b54ed25213fd1986b77760cbbe981b169d1be75425424359625555631631010
+  md5: a2a0b0131e697e808e5d52095b3dfd6c
+  depends:
+  - sbcl
+  - cl-asdf
+  license: Unlicense
+  run_exports: {}
+  size: 60877
+  timestamp: 1788616769361
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/anaphora-0.9.8-h4616a5c_0.conda
+  sha256: 44b191f70caae2f32f69c899f2294ed4079e89b1a685e22e07c779c90af2ff33
+  md5: cf440c763e080f8944f33933c139a685
+  depends:
+  - sbcl
+  - cl-asdf
+  license: LicenseRef-PublicDomain
+  run_exports: {}
+  size: 11431
+  timestamp: 1788809415867
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/binding-arrows-0.0.0.2024.03.28-h4616a5c_0.conda
+  sha256: d71e266e5e86b5fcc2531d81c757c0659a2415afbce53e4eba0ee403d5c3ced3
+  md5: 3a52d6df5865438c0435e493c69078eb
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 16200
+  timestamp: 1791136573888
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-asdf-3.3.7.4-h4616a5c_2.conda
+  sha256: 1ed6d342944e127350f86f794f4f0c850ed3aa98e52170a4911e106209c40f57
+  md5: 4b75e34af3127c0dfbfddbb336e2f98f
+  depends:
+  - sbcl
+  license: MIT
+  run_exports: {}
+  size: 458726
+  timestamp: 1789325144124
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-babel-0.0.0.2025.09.05-h4616a5c_0.conda
+  sha256: fc2be6d9c7643cc0816f360254a2f5394704677e0a4324ae44e4118f686e3550
+  md5: 0f06a3977efc79ba42c5b567f446ec6a
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - trivial-features
+  - trivial-gray-streams
+  license: MIT
+  run_exports: {}
+  size: 242707
+  timestamp: 1788632792354
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-cffi-0.24.1.2026.08.21-h39481bf_3.conda
+  sha256: 1b8235a571de42446fe139cd79d85408e8892cc6a696679fbea1c54ad060a49a
+  md5: 248f8302f00df1120a9cb733b1549e91
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - trivial-features
+  - cl-babel
+  license: MIT
+  run_exports: {}
+  size: 105037
+  timestamp: 1790974900738
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-docsearch-0.0.0.2026.02.12-h4616a5c_0.conda
+  sha256: 57b4d5100f293a27520bab1833647f1758396688542c917dde3af51bd30e29a4
+  md5: c45e396b835e797129a6f7a4ea47a809
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 11104
+  timestamp: 1791143655323
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-for-0.0.0.2025.08.21-h4616a5c_0.conda
+  sha256: 5d9ef4f9c805b777b1e9a3743e234d14e67e4f7c3411eec7a36d8cd2cb200ed6
+  md5: 5779ec9232d0c755db506946261ba4c0
+  depends:
+  - sbcl
+  - cl-asdf
+  - documentation-utils
+  - lambda-fiddle
+  - form-fiddle
+  license: Zlib
+  run_exports: {}
+  size: 40523
+  timestamp: 1791137105447
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-isocline-repl-0.0.0.2026.09.18-h4616a5c_0.conda
+  sha256: 5cf98acfe841591231238d792ef784b3d872bbc4e0f4acaa82765163c1703ecc
+  md5: aced7620e661742bddc24f09edf0acb8
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - cl-cffi
+  - concrete-syntax-tree
+  - eclector
+  - styled-strings
+  - cl-isocline
+  license: MIT
+  run_exports: {}
+  size: 2985
+  timestamp: 1789739632507
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-optima-0.0.0.2015.06.29-h4616a5c_0.conda
+  sha256: dd7bdc2e68dec73c78e75c45c2c7a579e85afaaa745a041c6075a02a5d1b37ed
+  md5: d29e83d231095e55f0ceb65023f46ea3
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - closer-mop
+  - cl-ppcre
+  license: LicenseRef-LLGPL
+  run_exports: {}
+  size: 24217
+  timestamp: 1788689932676
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/cl-ppcre-2.1.2-h4616a5c_0.conda
+  sha256: 6e37446c213ec226ae351a6126c2b7644e2af134a2d180f04128360b04ed5727
+  md5: 64a44b4fe670a103967a904a1c8c7fb9
+  depends:
+  - sbcl
+  - cl-asdf
+  - flexi-streams
+  license: BSD-2-Clause
+  run_exports: {}
+  size: 133274
+  timestamp: 1788621461275
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/closer-mop-0.0.0.2026.08.29-h4616a5c_0.conda
+  sha256: 23690ac0a8319f73f413acf5028b55236b6b87cbc4300054e38478820c1c9417
+  md5: 09d346f2e02f8d8369ed0f655a5d73b6
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 25724
+  timestamp: 1788617877877
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/com.inuoe.jzon-0.0.0.2026.03.03-h4616a5c_0.conda
+  sha256: ebbfb843e50521d40f437cde6610cb9689fd00438dd67751523fcbb44e33f8e4
+  md5: 1e882c0d32f884f8afbe3911ee81fac0
+  depends:
+  - sbcl
+  - cl-asdf
+  - closer-mop
+  - flexi-streams
+  - float-features
+  - trivial-gray-streams
+  license: MIT
+  run_exports: {}
+  size: 80106
+  timestamp: 1791141302385
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/concrete-syntax-tree-0.3.0-h4616a5c_0.conda
+  sha256: 8562a1256c00f4b32dbc139491593513d4b90ec10cfe7075dcf4b272f5866bd4
+  md5: d53a1527abe9b53e99e60084c3fff11f
+  depends:
+  - sbcl
+  - cl-asdf
+  - acclimation
+  license: BSD-2-Clause
+  run_exports: {}
+  size: 59224
+  timestamp: 1788987061506
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/definitions-0.0.0.2025.08.21-h4616a5c_0.conda
+  sha256: 2870cc92c088f2e78c40ee05e124d98d316af90fa4277ed3e28bae5409958a5f
+  md5: 363cfbfdb9a21b77cf7e53c1aac5c9da
+  depends:
+  - sbcl
+  - cl-asdf
+  - documentation-utils
+  license: Zlib
+  run_exports: {}
+  size: 22986
+  timestamp: 1791126719174
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/documentation-utils-0.0.0.2025.08.21-h4616a5c_0.conda
+  sha256: 1c614112e1681298fd03cb5ea5daad76d424bcb85aa4a68832fef89298da4384
+  md5: ca185a0f5a967c3c866c320e39396670
+  depends:
+  - sbcl
+  - cl-asdf
+  - trivial-indent
+  license: Zlib
+  run_exports: {}
+  size: 14430
+  timestamp: 1791120848871
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/eclector-0.12.0-h4616a5c_0.conda
+  sha256: 00bc1b17bd06bae864d392d44e45e6fa75adb4afa514428d54f6413ade47f9d2
+  md5: 5d43876e244ff6e44fd8651e291ef005
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - closer-mop
+  - concrete-syntax-tree >=0.3.0
+  license: BSD-2-Clause
+  run_exports: {}
+  size: 2822017
+  timestamp: 1788987526312
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/esrap-0.0.0.2025.10.10-h4616a5c_0.conda
+  sha256: 02995db9902195557e00138a6605d24c0c7c23c0bcab0da5428364ffce29bf65
+  md5: b7d8cbb0d129f02f120d7faa19a8df93
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - trivial-with-current-source-form
+  license: MIT
+  run_exports: {}
+  size: 68477
+  timestamp: 1788706623711
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/file-attributes-0.0.0.2025.12.05-h4616a5c_0.conda
+  sha256: 73a2f0726e819a7c7f727692365a93abcf5be26a56302670bc32a48524920bdc
+  md5: fe5c03906e2c02187f0ab4e3cf69a8ce
+  depends:
+  - sbcl
+  - cl-asdf
+  - cl-cffi
+  - documentation-utils
+  license: Zlib
+  run_exports: {}
+  size: 15247
+  timestamp: 1791138735943
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/fiveam-1.4.3-h4616a5c_0.conda
+  sha256: f7ccd2fa4b626739a4b7df129ecbfa3d497dc06bccadf348a572892ca7689be2
+  md5: 0bd6d782f8226cdca23d325b80171d68
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - net.didierverna.asdf-flv
+  - trivial-backtrace
+  license: BSD-3-Clause
+  run_exports: {}
+  size: 36524
+  timestamp: 1788629686061
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/flexi-streams-1.0.20-h4616a5c_0.conda
+  sha256: ad8dab23a2531354b9177d44d531bc6f1e2e0d9f42cff796b76ad58376b78e90
+  md5: c25092d6493a158f214097bc73dc1efd
+  depends:
+  - sbcl
+  - cl-asdf
+  - trivial-gray-streams
+  license: BSD-2-Clause
+  run_exports: {}
+  size: 294296
+  timestamp: 1788621427497
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/float-features-0.0.0.2026.08.19-h4616a5c_0.conda
+  sha256: 93e14c21877090651fd21f130ab4c3253b46cd48be10a5d5c89017f8657cbab6
+  md5: 9211fa2b680369c9d0240b71485bc5df
+  depends:
+  - sbcl
+  - cl-asdf
+  - documentation-utils
+  - trivial-features
+  license: Zlib
+  run_exports: {}
+  size: 16717
+  timestamp: 1791143830890
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/form-fiddle-0.0.0.2025.08.21-h4616a5c_0.conda
+  sha256: 8d5b15de867276369c1e2b3d49ef1ad3d832085dcd07ec46bddfad77c4fad342
+  md5: ca48aad70de1a34fa031a0d7b62c9475
+  depends:
+  - sbcl
+  - cl-asdf
+  - documentation-utils
+  license: Zlib
+  run_exports: {}
+  size: 11304
+  timestamp: 1791137036949
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/lambda-fiddle-0.0.0.2025.08.21-h4616a5c_0.conda
+  sha256: 112b36dc59ff08edb5b79e22c3874e21b161e353006ed70f6dd67cbdaff5e207
+  md5: 210dbd4af58b332d0472580d1d3822a2
+  depends:
+  - sbcl
+  - cl-asdf
+  license: Zlib
+  run_exports: {}
+  size: 11656
+  timestamp: 1791136880627
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/let-plus-0.0.0.2018.03.07-h4616a5c_0.conda
+  sha256: 4bcd7ec1e6fa3fe1edca7ca496392f9c9d8b956165315d5ae8644b9c195457ab
+  md5: 0a396976eb97b07f5507b1bb6c739001
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  - anaphora
+  license: BSL-1.0
+  run_exports: {}
+  size: 15460
+  timestamp: 1788809456516
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/net.didierverna.asdf-flv-2.2-h4616a5c_0.conda
+  sha256: 3e36dd5a4c10c1b59cf6162bcd94310177c5537d8407e96b7d3fae9d4c64a469
+  md5: 2e2049a78057b35bc711909dc9929d89
+  depends:
+  - sbcl
+  - cl-asdf
+  license: FSFAP
+  run_exports: {}
+  size: 6914
+  timestamp: 1788622359006
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/parse-number-1.8-h4616a5c_0.conda
+  sha256: c573ff4814ef1b9f9022b663b63ad3006af78a895d69d6d35bdc21fcbe711f45
+  md5: 4de7c4ff5d50e4de76088d185af8886a
+  depends:
+  - sbcl
+  - cl-asdf
+  license: BSD-3-Clause
+  run_exports: {}
+  size: 10664
+  timestamp: 1788681672631
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/slime-2.32-h4616a5c_0.conda
+  sha256: e942531295c147ea4ad922afa60b5c161edd89f3c64a9fbc704c23e3b9773b0a
+  md5: 78bc78e08e96fed6708d782f2a015ff3
+  depends:
+  - sbcl
+  - cl-asdf
+  license: Unlicense
+  run_exports: {}
+  size: 649903
+  timestamp: 1788634592014
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/styled-strings-0.0.0.2026.09.26-h4616a5c_0.conda
+  sha256: 05c108d01ac09da0dd3b3cfda4ff147826343d5960118823c99592782d73998c
+  md5: 8f99df049ba5cbae08482d9cf0ba2a89
+  depends:
+  - sbcl
+  - cl-asdf
+  - alexandria
+  license: MIT
+  run_exports: {}
+  size: 67474
+  timestamp: 1790495957150
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-backtrace-0.0.0.2023.01.11-h4616a5c_0.conda
+  sha256: 27928e65b7dd4eacd842ad487362c42f11db80a02051693efd39a96644cb2c9f
+  md5: 534e43c222ec53b9624355c3d9a38ff6
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 14685
+  timestamp: 1788625120342
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-features-0.0.0.2026.09.08-h4616a5c_0.conda
+  sha256: 84c464808b06aebb49db113e7f1243581ec7350c2eecacfe31b7a2e25dbf5913
+  md5: 24603bb4f105290a9ff8a008c396bf0b
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 16993
+  timestamp: 1789251525820
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-gray-streams-0.0.0.2026.08.17-h4616a5c_0.conda
+  sha256: e4beb9d78eece3dc43eb0d916ba72de37a7a8f807665faac697180fe5e9cd3ea
+  md5: 545e8af8729a2bda70b363b8718d2e4f
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 13565
+  timestamp: 1788620787025
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-indent-0.0.0.2026.09.12-h4616a5c_0.conda
+  sha256: 29df3f02b4d2956275d7d8828592b4fffbe4615aa5bf884601e33caf71148efe
+  md5: db58609697c68bf1c0fad74b898373c1
+  depends:
+  - sbcl
+  - cl-asdf
+  license: Zlib
+  run_exports: {}
+  size: 10878
+  timestamp: 1789251529493
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-package-local-nicknames-0.0.0.2026.06.05-h4616a5c_0.conda
+  sha256: ec080d1c3479263ff2853ac1b0452b30b0a2b508f94daff440b4e823a38473fd
+  md5: ef894d985ab71cd466dd925ec24b0463
+  depends:
+  - sbcl
+  - cl-asdf
+  license: Unlicense
+  run_exports: {}
+  size: 8036
+  timestamp: 1791139638135
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-posix-fs-0.0.0.2026.10.04-h4616a5c_0.conda
+  sha256: 8c2c86d98fb9db2e884eea250970239a624d0357f4a10b0aceff68a305b2d439
+  md5: 6b36eff4b49fc171cbc6039716f11c3c
+  depends:
+  - sbcl
+  - cl-asdf
+  - cl-ppcre
+  license: MIT
+  run_exports: {}
+  size: 7927
+  timestamp: 1791139403060
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/trivial-with-current-source-form-0.0.0.2025.11.12-h4616a5c_0.conda
+  sha256: 2df5e92901e813bb87a4e9b9cea00dbace88b5ad812a20ee7784fd31d753b764
+  md5: 95fa2089e61661508283ef7148b49ccd
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 40284
+  timestamp: 1788706564411
+- conda: https://prefix.dev/common-lisp/common-lisp/noarch/unix-opts-0.0.0.2021.01.07-h4616a5c_0.conda
+  sha256: 74f527fd3049bce8a74ec8b22472c977d38a7aacac9d8bf8527a6c4506f95f86
+  md5: 338aaa1724931da14239b3668748036c
+  depends:
+  - sbcl
+  - cl-asdf
+  license: MIT
+  run_exports: {}
+  size: 18540
+  timestamp: 1791126382191
+- conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
+  build_number: 20
+  sha256: 1dd3fffd892081df9726d7eb7e0dea6198962ba775bd88842135a4ddb4deb3c9
+  md5: a9f577daf3de00bca7c3c76c0ecbd1de
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgomp >=7.5.0
+  constrains:
+  - openmp_impl <0.0a0
+  license: BSD-3-Clause
+  license_family: BSD
+  run_exports:
+    strong:
+    - _openmp_mutex >=4.5
+  size: 28948
+  timestamp: 1770939786096
+- conda: https://prefix.dev/conda-forge/linux-64/libgcc-16.2.0-ha9f2e26_7.conda
+  sha256: e031634c3a928f9594eba868bc46ef5230d6571a364a0c63215b06c4563bfcea
+  md5: 735629b400b70eeab21a2ba8f5b1c2ce
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  constrains:
+  - libgcc-ng ==16.2.0=*_7
+  - libgomp 16.2.0 he0feb66_7
+  license: GPL-3.0-only WITH GCC-exception-3.1
+  license_family: GPL
+  run_exports: {}
+  size: 1058444
+  timestamp: 1790303109576
+- conda: https://prefix.dev/conda-forge/linux-64/libgomp-16.2.0-he0feb66_7.conda
+  sha256: 92a0bb350c7be6a4eedcb4e111c60aefd176018e6b1c009a6e025dbe9bbcd758
+  md5: d904c7ddd95e026254b4b80808ee9e12
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  license: GPL-3.0-only WITH GCC-exception-3.1
+  license_family: GPL
+  run_exports:
+    strong:
+    - _openmp_mutex >=4.5
+  size: 640566
+  timestamp: 1790303046034
+- conda: https://prefix.dev/conda-forge/linux-64/libzlib-1.3.2-h25fd6f3_3.conda
+  sha256: eb8a0db0aa570124f7d2a93d7c7f596e3390df5e047818d873baad32985fc736
+  md5: 0de0122d9570a8ab637c6b73db268389
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  constrains:
+  - zlib 1.3.2 *_3
+  license: Zlib
+  license_family: Other
+  run_exports:
+    weak:
+    - libzlib >=1.3.2,<2.0a0
+  size: 63713
+  timestamp: 1785362952714
+- conda: https://prefix.dev/conda-forge/linux-64/sbcl-2.6.9-h7ddf93c_0.conda
+  sha256: 2fa0e759da28f63c3dd5dd5fe31abdf5896ddcd277b3a5cbc59bdd81197481d6
+  md5: 68287e62b98a864bd52fb9f879d4ec75
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=15
+  - zstd >=1.5.7,<1.6.0a0
+  license: BSD-2-Clause AND MIT
+  run_exports: {}
+  size: 13331140
+  timestamp: 1790445784636
+- conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_7.conda
+  sha256: 47d682b9f6d6ec9eb1a6e6c3e75ea6273e899e78fb7fc59f81d39745009fbc60
+  md5: aa459086047c0e5e27023ab19f8cb86a
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libzlib >=1.3.2,<2.0a0
+  license: BSD-3-Clause
+  license_family: BSD
+  run_exports:
+    weak:
+    - zstd >=1.5.7,<1.6.0a0
+  size: 601301
+  timestamp: 1786599621503

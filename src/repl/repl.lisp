@@ -142,8 +142,9 @@
         (ic:term-italic nil)
         (terpri))
 
-      (setf ql-setup:*quicklisp-home*
-            (make-pathname :defaults "~/quicklisp/"))
+      (when (find-package "QL-SETUP")
+        (setf (symbol-value (find-symbol "*QUICKLISP-HOME*" :ql-setup))
+              (make-pathname :defaults "~/quicklisp/")))
       (ic:set-default-completer (cffi:callback completer) (cffi:null-pointer))
       (ic:set-default-highlighter (cffi:callback highlighter) (cffi:null-pointer))
       (ic:set-prompt-marker "> " "")

@@ -1,0 +1,34 @@
+[workspace]
+authors = ["digikar99 <digikar@proton.me>"]
+channels = ["https://prefix.dev/conda-forge", "https://prefix.dev/common-lisp/common-lisp", "conda-forge"]
+name = "moonli-lang"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+build = {
+  cmd = "bash make-moonli-repl.sh",
+  outputs = ["moonli.repl"],
+}
+moonli-repl = { cmd = "./moonli.repl", depends-on = ["build"] }
+
+
+[dependencies]
+alexandria = ">=0.0.0.2026.5.12,<0.0.0.2027"
+esrap = ">=0.0.0.2025.10.10,<0.0.0.2026"
+definitions = ">=0.0.0.2025.8.21,<0.0.0.2026"
+fiveam = ">=1.4.3,<2"
+parse-number = ">=1.8,<2"
+slime = ">=2.32,<3"
+unix-opts = ">=0.0.0.2021.1.7,<0.0.0.2022"
+let-plus = ">=0.0.0.2018.3.7,<0.0.0.2019"
+cl-optima = ">=0.0.0.2015.6.29,<0.0.0.2016"
+cl-isocline-repl = ">=0.0.0.2026.9.18,<0.0.0.2027"
+cl-for = ">=0.0.0.2025.8.21,<0.0.0.2026"
+file-attributes = ">=0.0.0.2025.12.5,<0.0.0.2026"
+cl-docsearch = ">=0.0.0.2026.2.12,<0.0.0.2027"
+binding-arrows = ">=0.0.0.2024.3.28,<0.0.0.2025"
+trivial-posix-fs = ">=0.0.0.2026.10.4,<0.0.0.2027"
+"com.inuoe.jzon" = ">=0.0.0.2026.3.3,<0.0.0.2027"
+trivial-package-local-nicknames = ">=0.0.0.2026.6.5,<0.0.0.2027"
