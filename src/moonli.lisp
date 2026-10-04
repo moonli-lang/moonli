@@ -196,7 +196,7 @@ prior to transpilation errors.
         (format *standard-output* "; wrote ~A~%" (namestring target-file))))
     (values target-file debug-file)))
 
-(defmethod definitions/swank:offset-from-file-and-form-number
+(defmethod offset-from-file-and-form-number
     (form-number file-name (type (eql :moonli)))
   (with-open-file (f file-name :direction :input)
     (let ((*read-eval* nil))
@@ -220,7 +220,7 @@ prior to transpilation errors.
                       ((char= #\# next-char)
                        (read-line f nil nil nil))
                       (t
-                       (return-from definitions/swank:offset-from-file-and-form-number
+                       (return-from offset-from-file-and-form-number
                          (1+ (file-position f)))))))))
 
 (defun compile-moonli-file (source-file fasl-file)

@@ -1,7 +1,7 @@
 (defsystem "moonli"
   :depends-on ("alexandria"
                "esrap"
-               "definitions/swank"
+               "definitions"
                "fiveam"
                "let-plus"
                "optima"
@@ -42,6 +42,7 @@
                (:file "moonli")
                (:file "pretty-printer")
                (:file "binary")
+               (:file "definitions")
                (:file "contribs" :if-feature :sbcl))
   :perform (test-op (c s)
              (eval (read-from-string "(5AM:RUN! :MOONLI)")))
