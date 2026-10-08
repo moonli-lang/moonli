@@ -114,7 +114,9 @@
 
 (defsystem "moonli/curated-libraries"
   :description "A collection of curated libraries designed to correspond with the functionalities of Python's standard libraries."
-  :depends-on (;; Threading
+  :depends-on ("moonli/asdf"
+
+               ;; Threading
                "bordeaux-threads"
 
                ;; Text Processing Services
