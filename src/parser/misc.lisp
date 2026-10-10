@@ -50,20 +50,20 @@
          *whitespace
          #\))
   (:function (lambda (expr)
-               `(cons ,(third expr) ,(seventh expr)))))
+               `(,(third expr) . ,(seventh expr)))))
 
 (5am:def-test expr:cons ()
-  (5am:is (equal '(cons a b)
+  (5am:is (equal '(a . b)
                  (esrap:parse 'moonli-expression "(a . b)")))
-  (5am:is (equal '(cons a b)
+  (5am:is (equal '(a . b)
                  (esrap:parse 'moonli-expression "(a . b )")))
-  (5am:is (equal '(cons a b)
+  (5am:is (equal '(a . b)
                  (esrap:parse 'moonli-expression "( a . b )")))
-  (5am:is (equal '(cons a (identity))
+  (5am:is (equal '(a . (identity))
                  (esrap:parse 'moonli-expression "(a . identity())")))
-  (5am:is (equal '(cons (identity) 42)
+  (5am:is (equal '((identity) . 42)
                  (esrap:parse 'moonli-expression "(identity() . 42)")))
-  (5am:is (equal '(cons (identity) (list 1 2 3))
+  (5am:is (equal '((identity) . (list 1 2 3))
                  (esrap:parse 'moonli-expression "(identity() . (1, 2, 3))"))))
 
 (esrap:defrule expr:list
