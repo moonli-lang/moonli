@@ -90,8 +90,9 @@
             (setf processors (stable-sort processors #'> :key #'car))
 
             (setf moonli:*site-init-path*
-                  (uiop:native-namestring
-                   (merge-pathnames ".moonlirc" (user-homedir-pathname))))
+                  (or (uiop:getenv "MOONLIRC")
+                      (uiop:native-namestring
+                       (merge-pathnames ".moonlirc" (user-homedir-pathname)))))
 
             ;; Process options with positive priorities
             (dolist (processor processors)
