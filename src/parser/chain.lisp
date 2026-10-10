@@ -13,8 +13,8 @@
                (optima:ematch expr
                  ((list "(" nil expr nil ")")
                   (list 'list expr))
-                 ((list* 'list _)
-                  expr)))))
+                 (_
+                  (cons 'list expr))))))
 
 (esrap:defrule chain
     (and atomic-expression
@@ -55,7 +55,7 @@
    :moonli "x[i,j]")
   (:lisp (aref (aref s i) j)
    :moonli "s[i][j]")
-  (:lisp (aref (aref (make-array (list 2 3)) i) j)
+  (:lisp (aref (aref (make-array (2 3)) i) j)
    :moonli "make-array((2,3))[i][j]")
   (:lisp a :moonli "a")
   (:lisp (a) :moonli "a()")

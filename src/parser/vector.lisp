@@ -2,6 +2,11 @@
 
 (5am:in-suite :moonli)
 
+;; We probably won't emit literal vectors from the vector syntax.  This is
+;; mainly because the use case of vectors within json needs evaluation. Further,
+;; most lisp syntax does not rely on literal vectors, the way it relies on
+;; literal lists and cons.
+
 (esrap:defrule expr:vector
     (or (and #\[ *whitespace #\])
         (and #\[

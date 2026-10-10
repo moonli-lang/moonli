@@ -35,7 +35,7 @@ end"
   list(x, y, z) : x + y + z;
   sym : sym;
 end"
-   :lisp (optima:match (list 2 3 4)
+   :lisp (optima:match (2 3 4)
            ((list x y z)
             (+ (+ x y) z))
            (sym sym)))
@@ -51,7 +51,7 @@ end"
   vector(x, y, list(num, _)) : x + y + num;
   sym : sym;
 end"
-   :lisp (optima:match (vector 2 3 (list 42 "hello world"))
+   :lisp (optima:match (vector 2 3 (42 "hello world"))
            ((vector x y (list num _))
             (+ (+ x y) num))
            (sym sym))))
