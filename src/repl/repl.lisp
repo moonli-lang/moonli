@@ -149,4 +149,19 @@
       (ic:set-default-highlighter (cffi:callback highlighter) (cffi:null-pointer))
       (ic:set-prompt-marker "> " "")
       (ic:enable-multiline-indent nil)
-      (ic-repl:repl))))
+      (if (not *dumb-repl*)
+          (ic-repl:repl)
+          (progn
+            (isocline:term-reset)
+            (if (eq ic-repl:*read-function* 'cl:read)
+                ;; #+sbcl
+                ;; (sb-impl::toplevel-repl nil)
+                ;; #-sbcl
+                (with-standard-io-syntax
+                  (loop (write-string "* ")
+                        (force-output)
+                        (let ((results (multiple-value-list (eval (read)))))
+                          (dolist (r results)
+                            (prin1 r)
+                            (terpri)))))
+                (main)))))))

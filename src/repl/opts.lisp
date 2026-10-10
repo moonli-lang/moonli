@@ -48,7 +48,13 @@
   (:name :silent
    :description "Don't print logo and program information"
    :short #\s
-   :long "silent"))
+   :long "silent")
+  (:name :no-isocline
+   :description "Start a dumb terminal without isocline"
+   :long "no-isocline")
+  (:name :lisp
+   :description "Start in lisp mode"
+   :long "lisp"))
 
 (defvar *debugger-enabled-p* nil)
 
@@ -81,3 +87,14 @@
   (cons 100
         (lambda ()
           (setf ic-repl:*history-file* (uiop:native-namestring arg)))))
+
+(defmethod process-option ((option (eql :lisp)) arg)
+  (cons 0
+        (lambda ()
+          (setf ic-repl:*read-function* 'cl:read))))
+
+(defvar *dumb-repl* nil)
+(defmethod process-option ((option (eql :no-isocline)) arg)
+  (cons 0
+        (lambda ()
+          (setf *dumb-repl* t))))
