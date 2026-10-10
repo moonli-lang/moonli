@@ -154,9 +154,9 @@
           (progn
             (isocline:term-reset)
             (if (eq ic-repl:*read-function* 'cl:read)
-                ;; #+sbcl
-                ;; (sb-impl::toplevel-repl nil)
-                ;; #-sbcl
+                #+sbcl
+                (sb-impl::toplevel-repl nil)
+                #-sbcl
                 (with-standard-io-syntax
                   (loop (write-string "* ")
                         (force-output)
