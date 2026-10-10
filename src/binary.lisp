@@ -3,6 +3,21 @@
 
 (in-package :moonli)
 
+(defun prepare-for-dump ()
+  (push :sb-aclrepl *contrib-blacklist*)
+  (require-all-contribs)
+  (when (find-package :cffi)
+    (mapc (fdefinition (find-symbol "CLOSE-FOREIGN-LIBRARY" "CFFI"))
+          (remove (find-symbol "LIBISOCLINE" "ISOCLINE")
+                  (uiop:symbol-call :cffi "LIST-FOREIGN-LIBRARIES")
+                  :key (find-symbol "FOREIGN-LIBRARY-NAME" "CFFI"))))
+  (asdf:clear-configuration)
+  (maphash (lambda (name system)
+             (unless (or (uiop:string-prefix-p "quicklisp" name)
+                         (uiop:string-prefix-p "ql-https" name))
+               (asdf:register-immutable-system system)))
+           asdf/system-registry:*registered-systems*))
+
 (unix-opts:define-opts
 
   (:name :help

@@ -51,18 +51,9 @@
   :entry-point "moonli:main")
 
 #+sb-core-compression
-(defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
-  (eval `(push :sb-aclrepl ,(find-symbol "*CONTRIB-BLACKLIST*" :moonli)))
-  (uiop:symbol-call :moonli '#:require-all-contribs)
-  (when (find-package :cffi)
-    (mapc (fdefinition (find-symbol "CLOSE-FOREIGN-LIBRARY" "CFFI"))
-          (remove (find-symbol "LIBISOCLINE" "ISOCLINE")
-                  (uiop:symbol-call :cffi "LIST-FOREIGN-LIBRARIES")
-                  :key (find-symbol "FOREIGN-LIBRARY-NAME" "CFFI"))))
-  (asdf:clear-configuration)
-  (uiop:dump-image (asdf:output-file o c)
-                   :executable t
-                   :compression t))
+(defmethod asdf:perform ((o asdf:program-op) (c (eql (asdf:find-system "moonli"))))
+  (uiop:symbol-call :moonli '#:prepare-for-dump)
+  (uiop:dump-image (asdf:output-file o c) :executable t :compression t))
 
 (defsystem "moonli/asdf"
   :depends-on ("moonli")
@@ -96,6 +87,10 @@
                 :components ((:file "for")
                              (:file "arrows")))))
 
+(defmethod asdf:perform ((o asdf:program-op) (c (eql (asdf:find-system "moonli/repl"))))
+  (uiop:symbol-call :moonli '#:prepare-for-dump)
+  (uiop:dump-image (asdf:output-file o c) :executable t :compression t))
+
 (defsystem "moonli/ciel"
   :depends-on ("moonli/repl"
                "ciel")
@@ -105,6 +100,10 @@
   :pathname "src/"
   :license "MIT"
   :components ((:file "repl/ciel")))
+
+(defmethod asdf:perform ((o asdf:program-op) (c (eql (asdf:find-system "moonli/ciel"))))
+  (uiop:symbol-call :moonli '#:prepare-for-dump)
+  (uiop:dump-image (asdf:output-file o c) :executable t :compression t))
 
 (defsystem "moonli/alive-lsp"
   :pathname #p"src/"
