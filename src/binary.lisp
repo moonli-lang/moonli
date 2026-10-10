@@ -11,7 +11,6 @@
           (remove (find-symbol "LIBISOCLINE" "ISOCLINE")
                   (uiop:symbol-call :cffi "LIST-FOREIGN-LIBRARIES")
                   :key (find-symbol "FOREIGN-LIBRARY-NAME" "CFFI"))))
-  (asdf:clear-configuration)
   (maphash (lambda (name system)
              (unless (or (uiop:string-prefix-p "quicklisp" name)
                          (uiop:string-prefix-p "ql-https" name))
