@@ -72,7 +72,7 @@
   (declare (ignore option arg))
   (cons 90
         (lambda ()
-          (setq *debugger-enabled-p* t))))
+          (setq ic-repl:*debugger-enabled-p* t))))
 
 (defvar *silent* nil)
 
