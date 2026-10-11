@@ -83,10 +83,11 @@
   "When T, the *site-init-path* for moonli has already been loaded.")
 
 (defun ensure-site-init-loaded ()
-  (when *site-init*
-    (unless *site-init-loaded*
-      (moonli:load-moonli-file *site-init-path* :transpile nil)
-      (setf *site-init-loaded* t))))
+  (when (and *site-init*
+             (probe-file *site-init-path*)
+             (not *site-init-loaded*))
+    (moonli:load-moonli-file *site-init-path* :transpile nil)
+    (setf *site-init-loaded* t)))
 
 (defmethod process-option ((option (eql :no-init)) arg)
   (declare (ignore option arg))
