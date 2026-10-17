@@ -24,5 +24,6 @@
   (:import-from #:moonli
                 #:process-option
                 #:moonsh-atomic-expression
-                #:ensure-site-init-loaded)
+                #:ensure-site-init-loaded
+                #:*lisp-mode*)
   (:export #:main))

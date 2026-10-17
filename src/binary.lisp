@@ -95,12 +95,22 @@
         (lambda ()
           (setf *site-init* nil))))
 
+(defvar *lisp-mode* nil)
+
+(defmethod process-option ((option (eql :lisp)) arg)
+  (cons 0
+        (lambda ()
+          (setf *lisp-mode* t))))
+
 (defmethod process-option ((option (eql :eval)) arg)
   (declare (ignore option))
   (cons 0
         (lambda ()
           (ensure-site-init-loaded)
-          (eval (moonli:read-moonli-from-string arg)))))
+          (eval
+           (if *lisp-mode*
+               (cl:read-from-string arg)
+               (moonli:read-moonli-from-string arg))))))
 
 (defmethod process-option ((option (eql :load)) arg)
   (declare (ignore option))

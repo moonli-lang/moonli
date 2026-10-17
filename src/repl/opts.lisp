@@ -91,6 +91,7 @@
 (defmethod process-option ((option (eql :lisp)) arg)
   (cons 0
         (lambda ()
+          (setf *lisp-mode* t)
           (setf ic-repl:*read-function* 'cl:read))))
 
 (defvar *dumb-repl* nil)
