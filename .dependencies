@@ -1,6 +1,6 @@
-("definitions" :git "https://codeberg.org/digikar/definitions.git" :branch "swank")
-("peltadot" :git "https://gitlab.com/digikar/peltadot")
+("peltadot" :git "https://codeberg.org/digikar/peltadot.git")
 ("cl-isocline" :git "https://github.com/digikar99/cl-isocline")
 ("trivial-posix-fs" :git "https://codeberg.org/digikar/trivial-posix-fs")
 ("file-formats" :git "https://codeberg.org/digikar/file-formats")
 ("docsearch" :git "https://github.com/digikar99/cl-docsearch")
+("alive-lsp" :git "https://github.com/moonli-lang/alive-lsp")
